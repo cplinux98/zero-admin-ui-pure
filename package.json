@@ -1,6 +1,6 @@
 {
-  "name": "pure-admin-thin",
-  "version": "5.6.0",
+  "name": "zero-admin",
+  "version": "1.0.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -53,6 +53,9 @@
     "@pureadmin/utils": "^2.4.7",
     "@vueuse/core": "^10.9.0",
     "@vueuse/motion": "^2.1.0",
+    "@zxcvbn-ts/core": "^3.0.4",
+    "cropperjs": "^1.6.1",
+    "vue-json-pretty": "^2.4.0",
     "animate.css": "^4.1.1",
     "axios": "^1.6.8",
     "dayjs": "^1.11.11",

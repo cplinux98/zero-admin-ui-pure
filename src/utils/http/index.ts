@@ -13,7 +13,10 @@ import { stringify } from "qs";
 import NProgress from "../progress";
 import { getToken, formatToken } from "@/utils/auth";
 import { useUserStoreHook } from "@/store/modules/user";
-
+import errorCode from "./error-code";
+import { ref } from "vue";
+import { ElMessageBox, ElNotification } from "element-plus";
+import { message } from "@/utils/message";
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
   // 请求超时时间
@@ -28,6 +31,8 @@ const defaultConfig: AxiosRequestConfig = {
     serialize: stringify as unknown as CustomParamsSerializer
   }
 };
+// 是否显示重新登录
+const isRelogin = ref(false);
 
 class PureHttp {
   constructor() {
@@ -132,6 +137,48 @@ class PureHttp {
           PureHttp.initConfig.beforeResponseCallback(response);
           return response.data;
         }
+        // 二进制数据则直接返回
+        if (
+          response.request.responseType === "blob" ||
+          response.request.responseType === "arraybuffer"
+        ) {
+          return response.data;
+        }
+
+        // dataAxios 是 axios 返回数据中的 data
+        const code = response.data.code || 200;
+        // 获取错误信息
+        const msg =
+          errorCode[code] || response.data.message || errorCode["default"];
+
+        if (code === 401) {
+          if (!isRelogin.value) {
+            isRelogin.value = true;
+            ElMessageBox.confirm(
+              "登录状态已过期，您可以继续留在该页面，或者重新登录",
+              "系统提示",
+              {
+                confirmButtonText: "重新登录",
+                cancelButtonText: "取消",
+                type: "warning"
+              }
+            )
+              .then(async () => {
+                isRelogin.value = false;
+                console.log("logout");
+                await useUserStoreHook().logOut();
+              })
+              .catch(() => {
+                isRelogin.value = false;
+              });
+          }
+        } else if (code === 500) {
+          message(msg, { type: "error" });
+        } else if (code != 200) {
+          ElNotification.error({ title: msg });
+          return Promise.reject("error");
+        }
+
         return response.data;
       },
       (error: PureHttpError) => {
@@ -167,6 +214,7 @@ class PureHttp {
           resolve(response);
         })
         .catch(error => {
+          message(error, { type: "error" });
           reject(error);
         });
     });

@@ -13,9 +13,7 @@ import { stringify } from "qs";
 import NProgress from "../progress";
 import { getToken, formatToken } from "@/utils/auth";
 import { useUserStoreHook } from "@/store/modules/user";
-import errorCode from "./error-code";
-import { ref } from "vue";
-import { ElMessageBox, ElNotification } from "element-plus";
+// import { ref } from "vue";
 import { message } from "@/utils/message";
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
@@ -32,7 +30,7 @@ const defaultConfig: AxiosRequestConfig = {
   }
 };
 // 是否显示重新登录
-const isRelogin = ref(false);
+// const isRelogin = ref(false);
 
 class PureHttp {
   constructor() {
@@ -125,6 +123,37 @@ class PureHttp {
     const instance = PureHttp.axiosInstance;
     instance.interceptors.response.use(
       (response: PureHttpResponse) => {
+        let code = undefined;
+        let msg = undefined;
+
+        // 如果data里面没有东西，则提示错误
+        if (!response.data) {
+          // console.log(response.data);
+          // message("响应错误：无响应数据", { type: "error" });
+          message("响应错误：响应格式不正确", { type: "error" });
+          NProgress.done();
+          return Promise.reject(response);
+        }
+
+        // 二进制数据则直接返回
+        if (response.data instanceof ArrayBuffer) {
+          return response;
+        } else {
+          // 非二进制流，解析code和msg
+          code = response.data.code;
+          msg = response.data.msg;
+        }
+
+        // 处理业务码错误的情况
+        if (code === undefined || code !== 200) {
+          // console.log("xxxxxxxxxxx");
+          msg = `${code}: ${msg}`;
+          message(msg, { type: "error" });
+          NProgress.done();
+          return Promise.reject(msg);
+        }
+
+        // 平台自身的拦截处理
         const $config = response.config;
         // 关闭进度条动画
         NProgress.done();
@@ -137,47 +166,40 @@ class PureHttp {
           PureHttp.initConfig.beforeResponseCallback(response);
           return response.data;
         }
-        // 二进制数据则直接返回
-        if (
-          response.request.responseType === "blob" ||
-          response.request.responseType === "arraybuffer"
-        ) {
-          return response.data;
-        }
 
-        // dataAxios 是 axios 返回数据中的 data
-        const code = response.data.code || 200;
-        // 获取错误信息
-        const msg =
-          errorCode[code] || response.data.message || errorCode["default"];
-
-        if (code === 401) {
-          if (!isRelogin.value) {
-            isRelogin.value = true;
-            ElMessageBox.confirm(
-              "登录状态已过期，您可以继续留在该页面，或者重新登录",
-              "系统提示",
-              {
-                confirmButtonText: "重新登录",
-                cancelButtonText: "取消",
-                type: "warning"
-              }
-            )
-              .then(async () => {
-                isRelogin.value = false;
-                console.log("logout");
-                await useUserStoreHook().logOut();
-              })
-              .catch(() => {
-                isRelogin.value = false;
-              });
-          }
-        } else if (code === 500) {
-          message(msg, { type: "error" });
-        } else if (code != 200) {
-          ElNotification.error({ title: msg });
-          return Promise.reject("error");
-        }
+        // // dataAxios 是 axios 返回数据中的 data
+        // const code = response.data.code || 200;
+        // // 获取错误信息
+        // const msg =
+        //   errorCode[code] || response.data.message || errorCode["default"];
+        //
+        // if (code === 401) {
+        //   if (!isRelogin.value) {
+        //     isRelogin.value = true;
+        //     ElMessageBox.confirm(
+        //       "登录状态已过期，您可以继续留在该页面，或者重新登录",
+        //       "系统提示",
+        //       {
+        //         confirmButtonText: "重新登录",
+        //         cancelButtonText: "取消",
+        //         type: "warning"
+        //       }
+        //     )
+        //       .then(async () => {
+        //         isRelogin.value = false;
+        //         console.log("logout");
+        //         await useUserStoreHook().logOut();
+        //       })
+        //       .catch(() => {
+        //         isRelogin.value = false;
+        //       });
+        //   }
+        // } else if (code === 500) {
+        //   message(msg, { type: "error" });
+        // } else if (code != 200) {
+        //   ElNotification.error({ title: msg });
+        //   return Promise.reject("error");
+        // }
 
         return response.data;
       },
@@ -214,7 +236,27 @@ class PureHttp {
           resolve(response);
         })
         .catch(error => {
-          message(error, { type: "error" });
+          // console.log(error);
+          // 错误处理：https://github.com/valarchie/AgileBoot-Front-End/tree/main
+          // 某些情况网络失效，此时直接进入error流程，所以在这边也进行拦截
+          if (!error.response) {
+            console.log(error);
+            // message("响应错误：无响应数据", { type: "error" });
+            reject(error);
+          }
+
+          if (error.response && error.response.status >= 500) {
+            message(`网络异常：${error}`, { type: "error" });
+          }
+
+          if (
+            error.response &&
+            error.response.status >= 400 &&
+            error.response.status < 500
+          ) {
+            message(`请求接口出错：${error}`, { type: "error" });
+          }
+
           reject(error);
         });
     });

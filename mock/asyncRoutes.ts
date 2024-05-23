@@ -142,7 +142,8 @@ export default defineFakeRoute([
     method: "get",
     response: () => {
       return {
-        success: true,
+        code: 200,
+        msg: "success",
         data: [
           // permissionRouter,
           systemManagementRouter,

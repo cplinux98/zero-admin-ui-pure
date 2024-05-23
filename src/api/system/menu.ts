@@ -28,3 +28,8 @@ export const updateMenu = (id?: number, data?: object) => {
     data
   });
 };
+
+/** 删除 */
+export const deleteMenu = (id: number) => {
+  return http.request<Result>("delete", baseURLApiV2("/system/menu/" + id));
+};

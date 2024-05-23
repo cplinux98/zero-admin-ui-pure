@@ -1,7 +1,13 @@
 import editForm from "../form.vue";
 import { handleTree } from "@/utils/tree";
 import { message } from "@/utils/message";
-import { createMenu, getMenu, getMenuList } from "@/api/system/menu";
+import {
+  createMenu,
+  deleteMenu,
+  getMenu,
+  getMenuList,
+  updateMenu
+} from "@/api/system/menu";
 import { addDialog } from "@/components/ReDialog";
 import { reactive, ref, onMounted, h } from "vue";
 import type { FormItemProps } from "../utils/types";
@@ -11,6 +17,32 @@ import { cloneDeep, isAllEmpty, deviceDetection } from "@pureadmin/utils";
 export function useMenu() {
   const form = reactive({
     title: ""
+  });
+
+  const defaultRow = ref<FormItemProps>({
+    id: 0,
+    menuType: 0,
+    higherMenuOptions: [],
+    parentId: 0,
+    title: "",
+    name: "",
+    path: "",
+    component: "",
+    rank: 99,
+    redirect: "",
+    icon: "",
+    extraIcon: "",
+    // enterTransition: "",
+    // leaveTransition: "",
+    activePath: "",
+    perm: "",
+    frameSrc: "",
+    frameLoading: true,
+    keepAlive: false,
+    hiddenTag: false,
+    fixedTag: false,
+    showLink: true,
+    showParent: false
   });
 
   const formRef = ref();
@@ -122,26 +154,30 @@ export function useMenu() {
     }, 500);
   }
 
-  // 创建或更新
-  async function onSave(id?: number, curData?: object) {
-    if (id) {
-    } else {
-      try {
-        loading.value = true;
-        const { data } = await createMenu(curData);
-        console.log(data);
-      } catch (e) {
-        // you can report use errorHandler or other
-      } finally {
-        loading.value = false;
-      }
-    }
-  }
+  // // 创建或更新
+  // async function onSave(id?: number, curData?: object) {
+  //   if (id) {
+  //   } else {
+  //     try {
+  //       loading.value = true;
+  //       const { data } = await createMenu(curData);
+  //       console.log(data);
+  //     } catch (e) {
+  //       // you can report use errorHandler or other
+  //     } finally {
+  //       loading.value = false;
+  //     }
+  //   }
+  // }
 
   function formatHigherMenuOptions(treeList) {
     if (!treeList || !treeList.length) return;
     const newTreeList = [];
     for (let i = 0; i < treeList.length; i++) {
+      // 菜单按钮不应该为上级菜单
+      if (treeList[i].menuType === 3) {
+        continue;
+      }
       treeList[i].title = treeList[i].title;
       formatHigherMenuOptions(treeList[i].children);
       newTreeList.push(treeList[i]);
@@ -149,87 +185,112 @@ export function useMenu() {
     return newTreeList;
   }
 
-  async function openDialog(title = "新增", id?: number) {
-    try {
-      let row = ref<FormItemProps>();
-      if (id) {
+  async function openDialog(title = "新增", id?: number, parentId?: number) {
+    let row = defaultRow.value;
+    row.higherMenuOptions = formatHigherMenuOptions(cloneDeep(dataList.value));
+    if (id) {
+      try {
         const { data } = await getMenu(id);
+        // console.log(data);
         row = data;
+      } catch (error) {
+        console.log(error);
       }
-      addDialog({
-        title: `${title}菜单`,
-        props: {
-          formInline: {
-            id: row.value?.id ?? 0,
-            menuType: row.value?.menuType ?? 0,
-            higherMenuOptions: formatHigherMenuOptions(
-              cloneDeep(dataList.value)
-            ),
-            parentId: row.value?.parentId ?? 0,
-            title: row.value?.title ?? "",
-            name: row.value?.name ?? "",
-            path: row.value?.path ?? "",
-            component: row.value?.component ?? "",
-            rank: row.value?.rank ?? 99,
-            redirect: row.value?.redirect ?? "",
-            icon: row.value?.icon ?? "",
-            extraIcon: row.value?.extraIcon ?? "",
-            enterTransition: row.value?.enterTransition ?? "",
-            leaveTransition: row.value?.leaveTransition ?? "",
-            activePath: row.value?.activePath ?? "",
-            perm: row.value?.perm ?? "",
-            frameSrc: row.value?.frameSrc ?? "",
-            frameLoading: row.value?.frameLoading ?? true,
-            keepAlive: row.value?.keepAlive ?? false,
-            hiddenTag: row.value?.hiddenTag ?? false,
-            fixedTag: row.value?.fixedTag ?? false,
-            showLink: row.value?.showLink ?? true,
-            showParent: row.value?.showParent ?? false
-          }
-        },
-        width: "45%",
-        draggable: true,
-        fullscreen: deviceDetection(),
-        fullscreenIcon: true,
-        closeOnClickModal: false,
-        contentRenderer: () => h(editForm, { ref: formRef }),
-        beforeSure: (done, { options }) => {
-          const FormRef = formRef.value.getRef();
-          const curData = options.props.formInline as FormItemProps;
-          function chores() {
-            message(`您${title}了菜单名称为${curData.title}的这条数据`, {
-              type: "success"
-            });
-            done(); // 关闭弹框
-            onSearch(); // 刷新表格数据
-          }
-          FormRef.validate(valid => {
-            if (valid) {
-              console.log("curData", curData);
-              // 表单规则校验通过
-              if (title === "新增") {
-                // 实际开发先调用新增接口，再进行下面操作
-                onSave(0, curData);
+    }
+
+    if (parentId) {
+      row.parentId = parentId;
+    }
+
+    // console.log(row.value);
+    addDialog({
+      title: `${title}菜单`,
+      props: {
+        formInline: row
+        // formInline: {
+        //   id: row.value?.id ?? 0,
+        //   menuType: row.value?.menuType ?? 0,
+        //   higherMenuOptions: formatHigherMenuOptions(cloneDeep(dataList.value)),
+        //   parentId: row.value?.parentId ?? 0,
+        //   title: row.value?.title ?? "",
+        //   name: row.value?.name ?? "",
+        //   path: row.value?.path ?? "",
+        //   component: row.value?.component ?? "",
+        //   rank: row.value?.rank ?? 99,
+        //   redirect: row.value?.redirect ?? "",
+        //   icon: row.value?.icon ?? "",
+        //   extraIcon: row.value?.extraIcon ?? "",
+        //   // enterTransition: row.value?.enterTransition ?? "",
+        //   // leaveTransition: row.value?.leaveTransition ?? "",
+        //   activePath: row.value?.activePath ?? "",
+        //   perm: row.value?.perm ?? "",
+        //   frameSrc: row.value?.frameSrc ?? "",
+        //   frameLoading: row.value?.frameLoading ?? true,
+        //   keepAlive: row.value?.keepAlive ?? false,
+        //   hiddenTag: row.value?.hiddenTag ?? false,
+        //   fixedTag: row.value?.fixedTag ?? false,
+        //   showLink: row.value?.showLink ?? true,
+        //   showParent: row.value?.showParent ?? false
+        // }
+      },
+      width: "45%",
+      draggable: true,
+      fullscreen: deviceDetection(),
+      fullscreenIcon: true,
+      closeOnClickModal: false,
+      contentRenderer: () => h(editForm, { ref: formRef }),
+      beforeSure: (done, { options }) => {
+        const FormRef = formRef.value.getRef();
+        const curData = options.props.formInline as FormItemProps;
+        function chores() {
+          message(`您${title}了菜单名称为${curData.title}的这条数据`, {
+            type: "success"
+          });
+          done(); // 关闭弹框
+          onSearch(); // 刷新表格数据
+        }
+        FormRef.validate(async valid => {
+          if (valid) {
+            console.log("curData", curData);
+            // 表单规则校验通过
+            if (title === "新增") {
+              // 实际开发先调用新增接口，再进行下面操作
+              // onSave(0, curData);
+              try {
+                loading.value = true;
+                await createMenu(curData);
                 chores();
-              } else {
-                // 实际开发先调用修改接口，再进行下面操作
-                onSave(id, curData);
+              } catch (e) {
+                // you can report use errorHandler or other
+              } finally {
+                loading.value = false;
+              }
+            } else {
+              // 实际开发先调用修改接口，再进行下面操作
+              try {
+                loading.value = true;
+                await updateMenu(id, curData);
                 chores();
+              } catch (e) {
+                // you can report use errorHandler or other
+              } finally {
+                loading.value = false;
               }
             }
-          });
-        }
-      });
-    } catch (error) {
-      console.error(error);
-    }
+          }
+        });
+      }
+    });
   }
 
-  function handleDelete(row) {
-    message(`您删除了菜单名称为${row.title}的这条数据`, {
-      type: "success"
-    });
-    onSearch();
+  async function handleDelete(row) {
+    try {
+      await deleteMenu(row.id);
+      message(`您删除了菜单名称为${row.title}的这条数据`, {
+        type: "success"
+      });
+      onSearch();
+    } catch (e) {}
   }
 
   onMounted(() => {
@@ -237,6 +298,8 @@ export function useMenu() {
   });
 
   return {
+    /** 默认值 **/
+    defaultRow,
     form,
     loading,
     columns,

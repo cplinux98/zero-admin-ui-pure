@@ -87,12 +87,12 @@ const showParentOptions: Array<OptionsType> = [
 const frameLoadingOptions: Array<OptionsType> = [
   {
     label: "开启",
-    tip: "有首次加载动画",
+    tip: "有首次加载loading蒙版",
     value: true
   },
   {
     label: "关闭",
-    tip: "无首次加载动画",
+    tip: "无首次加载loading蒙版",
     value: false
   }
 ];

@@ -15,7 +15,8 @@ import {
   showParentOptions,
   frameLoadingOptions
 } from "./utils/enums";
-
+import { useMenu } from "@/views/system/menu/utils/hook";
+const { defaultRow } = useMenu();
 const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({
     id: 0,
@@ -30,8 +31,8 @@ const props = withDefaults(defineProps<FormProps>(), {
     redirect: "",
     icon: "",
     extraIcon: "",
-    enterTransition: "",
-    leaveTransition: "",
+    // enterTransition: "",
+    // leaveTransition: "",
     activePath: "",
     perm: "",
     frameSrc: "",
@@ -189,22 +190,22 @@ defineExpose({ getRef });
         </el-form-item>
       </re-col>
 
-      <re-col v-show="newFormInline.menuType < 2" :value="12" :xs="24" :sm="24">
-        <el-form-item label="进场动画">
-          <ReAnimateSelector
-            v-model="newFormInline.enterTransition"
-            placeholder="请选择页面进场加载动画"
-          />
-        </el-form-item>
-      </re-col>
-      <re-col v-show="newFormInline.menuType < 2" :value="12" :xs="24" :sm="24">
-        <el-form-item label="离场动画">
-          <ReAnimateSelector
-            v-model="newFormInline.leaveTransition"
-            placeholder="请选择页面离场加载动画"
-          />
-        </el-form-item>
-      </re-col>
+      <!--      <re-col v-show="newFormInline.menuType < 2" :value="12" :xs="24" :sm="24">-->
+      <!--        <el-form-item label="进场动画">-->
+      <!--          <ReAnimateSelector-->
+      <!--            v-model="newFormInline.enterTransition"-->
+      <!--            placeholder="请选择页面进场加载动画"-->
+      <!--          />-->
+      <!--        </el-form-item>-->
+      <!--      </re-col>-->
+      <!--      <re-col v-show="newFormInline.menuType < 2" :value="12" :xs="24" :sm="24">-->
+      <!--        <el-form-item label="离场动画">-->
+      <!--          <ReAnimateSelector-->
+      <!--            v-model="newFormInline.leaveTransition"-->
+      <!--            placeholder="请选择页面离场加载动画"-->
+      <!--          />-->
+      <!--        </el-form-item>-->
+      <!--      </re-col>-->
 
       <re-col
         v-show="newFormInline.menuType === 0"
@@ -247,7 +248,7 @@ defineExpose({ getRef });
         </el-form-item>
       </re-col>
       <re-col v-if="newFormInline.menuType === 1" :value="12" :xs="24" :sm="24">
-        <el-form-item label="加载动画">
+        <el-form-item label="加载蒙版">
           <Segmented
             :modelValue="newFormInline.frameLoading ? 0 : 1"
             :options="frameLoadingOptions"

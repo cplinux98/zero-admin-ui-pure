@@ -8,7 +8,8 @@ export default defineFakeRoute([
     response: ({ body }) => {
       if (body.refreshToken) {
         return {
-          success: true,
+          code: 200,
+          msg: "success",
           data: {
             accessToken: "eyJhbGciOiJIUzUxMiJ9.newAdmin",
             refreshToken: "eyJhbGciOiJIUzUxMiJ9.newAdminRefresh",
@@ -18,7 +19,8 @@ export default defineFakeRoute([
         };
       } else {
         return {
-          success: false,
+          code: 201,
+          msg: "success",
           data: {}
         };
       }

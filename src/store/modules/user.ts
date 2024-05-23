@@ -58,16 +58,24 @@ export const useUserStore = defineStore({
       this.loginDay = Number(value);
     },
     /** 登入 */
-    async loginByUsername(data) {
-      return new Promise<UserResult>((resolve, reject) => {
-        getLogin(data)
-          .then(data => {
-            if (data?.success) setToken(data.data);
-            resolve(data);
-          })
-          .catch(error => {
-            reject(error);
-          });
+    loginByUsername(data) {
+      return new Promise<UserResult>(async (resolve, reject) => {
+        try {
+          const response = await getLogin(data);
+          setToken(response.data);
+          resolve(data);
+        } catch (error) {
+          reject(error);
+        }
+
+        //   getLogin(data)
+        //     .then(data => {
+        //       if (data?.success) setToken(data.data);
+        //       resolve(data);
+        //     })
+        //     .catch(error => {
+        //       reject(error);
+        //     });
       });
     },
     /** 前端登出（不调用接口） */

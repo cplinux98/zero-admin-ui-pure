@@ -2,7 +2,7 @@ interface FormItemProps {
   /** 菜单类型（0代表菜单、1代表iframe、2代表外链、3代表按钮）*/
   id?: number;
   menuType: number;
-  higherMenuOptions: Record<string, unknown>[];
+  // higherMenuOptions: Record<string, unknown>[];
   parentId: number;
   title: string;
   name: string;
@@ -25,5 +25,9 @@ interface FormItemProps {
 interface FormProps {
   formInline: FormItemProps;
 }
+
+// interface HigherMenuOptions {
+//   [key: string]: any;
+// }
 
 export type { FormItemProps, FormProps };

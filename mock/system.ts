@@ -61,6 +61,64 @@ export default defineFakeRoute([
       };
     }
   },
+  {
+    url: "/getUserByIds",
+    method: "get",
+    response: () => {
+      let list = [
+        {
+          avatar: "https://avatars.githubusercontent.com/u/44761321",
+          username: "admin",
+          nickname: "小铭",
+          phone: "15888886789",
+          email: faker.internet.email(),
+          sex: 0,
+          id: 1,
+          status: 1,
+          dept: {
+            // 部门id
+            id: 103,
+            // 部门名称
+            name: "研发部门"
+          },
+          remark: "管理员",
+          createTime: 1605456000000
+        },
+        {
+          avatar: "https://avatars.githubusercontent.com/u/52823142",
+          username: "common",
+          nickname: "小林",
+          phone: "18288882345",
+          email: faker.internet.email(),
+          sex: 1,
+          id: 2,
+          status: 1,
+          dept: {
+            id: 105,
+            name: "测试部门"
+          },
+          remark: "普通用户",
+          createTime: 1605456000000
+        }
+      ];
+      // list = list.filter(item => item.username.includes(body?.username));
+      // list = list.filter(item =>
+      //   String(item.status).includes(String(body?.status))
+      // );
+      // if (body.phone) list = list.filter(item => item.phone === body.phone);
+      // if (body.deptId) list = list.filter(item => item.dept.id === body.deptId);
+      return {
+        code: 200,
+        msg: "success",
+        data: {
+          list,
+          total: list.length, // 总条目数
+          pageSize: 10, // 每页显示条目个数
+          currentPage: 1 // 当前页数
+        }
+      };
+    }
+  },
   // 用户管理-获取所有角色列表
   {
     url: "/list-all-role",
@@ -1159,7 +1217,8 @@ export default defineFakeRoute([
             status: 1, // 状态 1 启用 0 停用
             type: 1, // 1 公司 2 分公司 3 部门
             createTime: 1605456000000,
-            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
+            description:
+              "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
           },
           {
             name: "郑州分公司",
@@ -1172,46 +1231,53 @@ export default defineFakeRoute([
             status: 1,
             type: 2,
             createTime: 1605456000000,
-            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
+            description:
+              "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
           },
           {
             name: "研发部门",
             parentId: 101,
             id: 103,
             sort: 1,
+            leader: [1],
             phone: "15888888888",
             principal: faker.person.firstName(),
             email: faker.internet.email(),
             status: 1,
             type: 3,
             createTime: 1605456000000,
-            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
+            description:
+              "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
           },
           {
             name: "市场部门",
             parentId: 102,
             id: 108,
             sort: 1,
+            leader: [1, 2],
             phone: "15888888888",
             principal: faker.person.firstName(),
             email: faker.internet.email(),
             status: 1,
             type: 3,
             createTime: 1605456000000,
-            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
+            description:
+              "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
           },
           {
             name: "深圳分公司",
             parentId: 100,
             id: 102,
             sort: 2,
+            leader: [2],
             phone: "15888888888",
             principal: faker.person.firstName(),
             email: faker.internet.email(),
             status: 1,
             type: 2,
             createTime: 1605456000000,
-            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
+            description:
+              "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
           },
           {
             name: "市场部门",
@@ -1224,7 +1290,8 @@ export default defineFakeRoute([
             status: 1,
             type: 3,
             createTime: 1605456000000,
-            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
+            description:
+              "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
           },
           {
             name: "财务部门",
@@ -1237,7 +1304,8 @@ export default defineFakeRoute([
             status: 1,
             type: 3,
             createTime: 1605456000000,
-            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
+            description:
+              "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
           },
           {
             name: "测试部门",
@@ -1250,7 +1318,8 @@ export default defineFakeRoute([
             status: 0,
             type: 3,
             createTime: 1605456000000,
-            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
+            description:
+              "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
           },
           {
             name: "财务部门",
@@ -1263,7 +1332,8 @@ export default defineFakeRoute([
             status: 1,
             type: 3,
             createTime: 1605456000000,
-            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
+            description:
+              "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
           },
           {
             name: "运维部门",
@@ -1276,7 +1346,8 @@ export default defineFakeRoute([
             status: 0,
             type: 3,
             createTime: 1605456000000,
-            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
+            description:
+              "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
           }
         ]
       };

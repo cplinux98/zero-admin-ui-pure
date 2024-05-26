@@ -2,18 +2,16 @@ import dayjs from "dayjs";
 import editForm from "../form.vue";
 import { handleTree } from "@/utils/tree";
 import { message } from "@/utils/message";
-import { getDeptList } from "@/api/system";
+import { getDept, getDeptList } from "@/api/system/dept";
 import { usePublicHooks } from "../../hooks";
 import { addDialog } from "@/components/ReDialog";
 import { reactive, ref, onMounted, h } from "vue";
 import type { FormItemProps } from "../utils/types";
-import { cloneDeep, isAllEmpty, deviceDetection } from "@pureadmin/utils";
+import { cloneDeep, deviceDetection } from "@pureadmin/utils";
+import type { DeptForm, DeptQuery } from "@/api/system/dept/type";
 
 export function useDept() {
-  const form = reactive({
-    name: "",
-    status: null
-  });
+  const form = reactive<DeptQuery>({});
 
   const formRef = ref();
   const dataList = ref([]);
@@ -47,11 +45,11 @@ export function useDept() {
       minWidth: 200,
       prop: "createTime",
       formatter: ({ createTime }) =>
-        dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
+        dayjs.unix(createTime).format("YYYY-MM-DD HH:mm:ss")
     },
     {
       label: "备注",
-      prop: "remark",
+      prop: "description",
       minWidth: 320
     },
     {
@@ -75,16 +73,16 @@ export function useDept() {
   async function onSearch() {
     loading.value = true;
     const { data } = await getDeptList(); // 这里是返回一维数组结构，前端自行处理成树结构，返回格式要求：唯一id加父节点parentId，parentId取父节点id
-    let newData = data;
-    if (!isAllEmpty(form.name)) {
-      // 前端搜索部门名称
-      newData = newData.filter(item => item.name.includes(form.name));
-    }
-    if (!isAllEmpty(form.status)) {
-      // 前端搜索状态
-      newData = newData.filter(item => item.status === form.status);
-    }
-    dataList.value = handleTree(newData); // 处理成树结构
+    // let newData = data;
+    // if (!isAllEmpty(form.name)) {
+    //   // 前端搜索部门名称
+    //   newData = newData.filter(item => item.name.includes(form.name));
+    // }
+    // if (!isAllEmpty(form.status)) {
+    //   // 前端搜索状态
+    //   newData = newData.filter(item => item.status === form.status);
+    // }
+    dataList.value = handleTree(data); // 处理成树结构
     setTimeout(() => {
       loading.value = false;
     }, 500);
@@ -102,21 +100,38 @@ export function useDept() {
     return newTreeList;
   }
 
-  function openDialog(title = "新增", row?: FormItemProps) {
+  // 获取上级菜单选项
+  function getHigherDeptOptions() {
+    return formatHigherDeptOptions(cloneDeep(dataList.value));
+  }
+
+  async function openDialog(title = "新增", id?: number, parentId?: number) {
+    let row = ref<DeptForm>({
+      id: undefined,
+      parentId: 0,
+      leader: [],
+      name: "",
+      sort: 0,
+      status: 1,
+      description: ""
+    });
+    if (id) {
+      try {
+        const { data } = await getDept(id);
+        row.value = data;
+      } catch (e) {
+        // 错误处理
+      }
+    }
+
+    if (parentId) {
+      row.value.parentId = parentId;
+    }
+
     addDialog({
       title: `${title}部门`,
       props: {
-        formInline: {
-          higherDeptOptions: formatHigherDeptOptions(cloneDeep(dataList.value)),
-          parentId: row?.parentId ?? 0,
-          name: row?.name ?? "",
-          principal: row?.principal ?? "",
-          phone: row?.phone ?? "",
-          email: row?.email ?? "",
-          sort: row?.sort ?? 0,
-          status: row?.status ?? 1,
-          remark: row?.remark ?? ""
-        }
+        formInline: row.value
       },
       width: "40%",
       draggable: true,
@@ -127,6 +142,7 @@ export function useDept() {
       beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
+
         function chores() {
           message(`您${title}了部门名称为${curData.name}的这条数据`, {
             type: "success"
@@ -134,6 +150,7 @@ export function useDept() {
           done(); // 关闭弹框
           onSearch(); // 刷新表格数据
         }
+
         FormRef.validate(valid => {
           if (valid) {
             console.log("curData", curData);
@@ -173,6 +190,7 @@ export function useDept() {
     openDialog,
     /** 删除部门 */
     handleDelete,
-    handleSelectionChange
+    handleSelectionChange,
+    getHigherDeptOptions
   };
 }

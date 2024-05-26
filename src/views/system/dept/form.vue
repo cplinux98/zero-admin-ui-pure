@@ -1,23 +1,25 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, withDefaults } from "vue";
 import ReCol from "@/components/ReCol";
 import { formRules } from "./utils/rule";
 import { FormProps } from "./utils/types";
 import { usePublicHooks } from "../hooks";
 
+import { useDept } from "@/views/system/dept/utils/hook";
+import ZeroAdminSelectUser from "@/components/ZeroAdminSelectUser/index.vue";
+
 const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({
-    higherDeptOptions: [],
+    id: undefined,
     parentId: 0,
+    leader: [],
     name: "",
-    principal: "",
-    phone: "",
-    email: "",
     sort: 0,
     status: 1,
-    remark: ""
+    description: ""
   })
 });
+const { getHigherDeptOptions } = useDept();
 
 const ruleFormRef = ref();
 const { switchStyle } = usePublicHooks();
@@ -43,7 +45,7 @@ defineExpose({ getRef });
           <el-cascader
             v-model="newFormInline.parentId"
             class="w-full"
-            :options="newFormInline.higherDeptOptions"
+            :options="getHigherDeptOptions()"
             :props="{
               value: 'id',
               label: 'name',
@@ -71,32 +73,10 @@ defineExpose({ getRef });
           />
         </el-form-item>
       </re-col>
-      <re-col :value="12" :xs="24" :sm="24">
+      <!--      选择部门负责人-->
+      <re-col>
         <el-form-item label="部门负责人">
-          <el-input
-            v-model="newFormInline.principal"
-            clearable
-            placeholder="请输入部门负责人"
-          />
-        </el-form-item>
-      </re-col>
-
-      <re-col :value="12" :xs="24" :sm="24">
-        <el-form-item label="手机号" prop="phone">
-          <el-input
-            v-model="newFormInline.phone"
-            clearable
-            placeholder="请输入手机号"
-          />
-        </el-form-item>
-      </re-col>
-      <re-col :value="12" :xs="24" :sm="24">
-        <el-form-item label="邮箱" prop="email">
-          <el-input
-            v-model="newFormInline.email"
-            clearable
-            placeholder="请输入邮箱"
-          />
+          <ZeroAdminSelectUser v-model="newFormInline.leader" />
         </el-form-item>
       </re-col>
 
@@ -128,7 +108,7 @@ defineExpose({ getRef });
       <re-col>
         <el-form-item label="备注">
           <el-input
-            v-model="newFormInline.remark"
+            v-model="newFormInline.description"
             placeholder="请输入备注信息"
             type="textarea"
           />

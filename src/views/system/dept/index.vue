@@ -112,7 +112,7 @@ const {
               type="primary"
               :size="size"
               :icon="useRenderIcon(EditPen)"
-              @click="openDialog('修改', row)"
+              @click="openDialog('修改', row.id)"
             >
               修改
             </el-button>
@@ -122,7 +122,7 @@ const {
               type="primary"
               :size="size"
               :icon="useRenderIcon(AddFill)"
-              @click="openDialog('新增', { parentId: row.id } as any)"
+              @click="openDialog('新增', 0, row.id)"
             >
               新增
             </el-button>

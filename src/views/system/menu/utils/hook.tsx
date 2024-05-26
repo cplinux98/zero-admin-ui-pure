@@ -19,32 +19,6 @@ export function useMenu() {
     title: ""
   });
 
-  const defaultRow = ref<FormItemProps>({
-    id: 0,
-    menuType: 0,
-    higherMenuOptions: [],
-    parentId: 0,
-    title: "",
-    name: "",
-    path: "",
-    component: "",
-    rank: 99,
-    redirect: "",
-    icon: "",
-    extraIcon: "",
-    // enterTransition: "",
-    // leaveTransition: "",
-    activePath: "",
-    perm: "",
-    frameSrc: "",
-    frameLoading: true,
-    keepAlive: false,
-    hiddenTag: false,
-    fixedTag: false,
-    showLink: true,
-    showParent: false
-  });
-
   const formRef = ref();
   const dataList = ref([]);
   const loading = ref(true);
@@ -154,22 +128,6 @@ export function useMenu() {
     }, 500);
   }
 
-  // // 创建或更新
-  // async function onSave(id?: number, curData?: object) {
-  //   if (id) {
-  //   } else {
-  //     try {
-  //       loading.value = true;
-  //       const { data } = await createMenu(curData);
-  //       console.log(data);
-  //     } catch (e) {
-  //       // you can report use errorHandler or other
-  //     } finally {
-  //       loading.value = false;
-  //     }
-  //   }
-  // }
-
   function formatHigherMenuOptions(treeList) {
     if (!treeList || !treeList.length) return;
     const newTreeList = [];
@@ -178,60 +136,62 @@ export function useMenu() {
       if (treeList[i].menuType === 3) {
         continue;
       }
-      treeList[i].title = treeList[i].title;
       formatHigherMenuOptions(treeList[i].children);
       newTreeList.push(treeList[i]);
     }
     return newTreeList;
   }
 
+  // 获取上级菜单选项
+  function getHigherMenuOptions() {
+    return formatHigherMenuOptions(cloneDeep(dataList.value));
+  }
+
   async function openDialog(title = "新增", id?: number, parentId?: number) {
-    let row = defaultRow.value;
-    row.higherMenuOptions = formatHigherMenuOptions(cloneDeep(dataList.value));
+    let row = ref<FormItemProps>({
+      // higherMenuOptions: formatHigherMenuOptions(cloneDeep(dataList.value)),
+      id: 0,
+      menuType: 0,
+      parentId: 0,
+      title: "",
+      name: "",
+      path: "",
+      component: "",
+      rank: 99,
+      redirect: "",
+      icon: "",
+      extraIcon: "",
+      // enterTransition: "",
+      // leaveTransition: "",
+      activePath: "",
+      perm: "",
+      frameSrc: "",
+      frameLoading: true,
+      keepAlive: false,
+      hiddenTag: false,
+      fixedTag: false,
+      showLink: true,
+      showParent: false
+    });
     if (id) {
       try {
         const { data } = await getMenu(id);
         // console.log(data);
-        row = data;
+        row.value = data;
       } catch (error) {
         console.log(error);
       }
     }
 
     if (parentId) {
-      row.parentId = parentId;
+      row.value.parentId = parentId;
     }
 
     // console.log(row.value);
     addDialog({
       title: `${title}菜单`,
       props: {
-        formInline: row
-        // formInline: {
-        //   id: row.value?.id ?? 0,
-        //   menuType: row.value?.menuType ?? 0,
-        //   higherMenuOptions: formatHigherMenuOptions(cloneDeep(dataList.value)),
-        //   parentId: row.value?.parentId ?? 0,
-        //   title: row.value?.title ?? "",
-        //   name: row.value?.name ?? "",
-        //   path: row.value?.path ?? "",
-        //   component: row.value?.component ?? "",
-        //   rank: row.value?.rank ?? 99,
-        //   redirect: row.value?.redirect ?? "",
-        //   icon: row.value?.icon ?? "",
-        //   extraIcon: row.value?.extraIcon ?? "",
-        //   // enterTransition: row.value?.enterTransition ?? "",
-        //   // leaveTransition: row.value?.leaveTransition ?? "",
-        //   activePath: row.value?.activePath ?? "",
-        //   perm: row.value?.perm ?? "",
-        //   frameSrc: row.value?.frameSrc ?? "",
-        //   frameLoading: row.value?.frameLoading ?? true,
-        //   keepAlive: row.value?.keepAlive ?? false,
-        //   hiddenTag: row.value?.hiddenTag ?? false,
-        //   fixedTag: row.value?.fixedTag ?? false,
-        //   showLink: row.value?.showLink ?? true,
-        //   showParent: row.value?.showParent ?? false
-        // }
+        formInline: row.value
       },
       width: "45%",
       draggable: true,
@@ -251,7 +211,8 @@ export function useMenu() {
         }
         FormRef.validate(async valid => {
           if (valid) {
-            console.log("curData", curData);
+            // curData.higherMenuOptions = [];
+            // console.log("curData", curData);
             // 表单规则校验通过
             if (title === "新增") {
               // 实际开发先调用新增接口，再进行下面操作
@@ -298,8 +259,9 @@ export function useMenu() {
   });
 
   return {
-    /** 默认值 **/
-    defaultRow,
+    // /** 默认值 **/
+    // defaultRow,
+    getHigherMenuOptions,
     form,
     loading,
     columns,

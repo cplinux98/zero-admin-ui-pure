@@ -63,6 +63,7 @@ export const useUserStore = defineStore({
         try {
           const response = await getLogin(data);
           setToken(response.data);
+          console.log(data);
           resolve(data);
         } catch (error) {
           reject(error);

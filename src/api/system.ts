@@ -27,6 +27,12 @@ export const getDeptList = (data?: object) => {
   return http.request<Result>("post", "/dept", { data });
 };
 
+/** 获取系统管理-部门管理列表 */
+// ids?: number[]
+export const getUserByIds = () => {
+  return http.request<Result>("get", "/getUserByIds");
+};
+
 /** 获取系统监控-在线用户列表 */
 export const getOnlineLogsList = (data?: object) => {
   return http.request<ResultTable>("post", "/online-logs", { data });

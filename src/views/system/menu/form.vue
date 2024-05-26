@@ -5,7 +5,6 @@ import { formRules } from "./utils/rule";
 import { FormProps } from "./utils/types";
 import { IconSelect } from "@/components/ReIcon";
 import Segmented from "@/components/ReSegmented";
-import ReAnimateSelector from "@/components/ReAnimateSelector";
 import {
   menuTypeOptions,
   showLinkOptions,
@@ -16,7 +15,8 @@ import {
   frameLoadingOptions
 } from "./utils/enums";
 import { useMenu } from "@/views/system/menu/utils/hook";
-const { defaultRow } = useMenu();
+
+const { getHigherMenuOptions } = useMenu();
 const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({
     id: 0,
@@ -77,7 +77,7 @@ defineExpose({ getRef });
           <el-cascader
             v-model="newFormInline.parentId"
             class="w-full"
-            :options="newFormInline.higherMenuOptions"
+            :options="getHigherMenuOptions()"
             :props="{
               value: 'id',
               label: 'title',

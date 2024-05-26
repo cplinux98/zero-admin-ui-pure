@@ -4,10 +4,10 @@ export type ArrayResult = {
   data?: Array<any>;
 };
 
-export type Result = {
+export type Result<T = any> = {
   code: number;
   msg: string;
-  data?: any;
+  data?: T;
 };
 
 export type ResultTable = {

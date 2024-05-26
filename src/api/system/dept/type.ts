@@ -7,7 +7,7 @@ export interface DeptQuery {
   /** 名称关键字 */
   name?: string;
   /** 状态 */
-  status?: number;
+  status?: boolean;
 }
 
 /**
@@ -25,7 +25,7 @@ export interface DeptVO {
   /** 显示排序 */
   sort: number;
   /** 状态 */
-  status: number;
+  status: boolean;
   /** 描述 */
   description: string;
   /** 创建时间 */
@@ -54,7 +54,7 @@ export interface DeptForm {
   /** 显示排序 */
   sort: number;
   /** 状态 */
-  status: number;
+  status: boolean;
   /** 描述 */
   description: string;
 }

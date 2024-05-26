@@ -7,6 +7,8 @@ import { usePublicHooks } from "../hooks";
 
 import { useDept } from "@/views/system/dept/utils/hook";
 import ZeroAdminSelectUser from "@/components/ZeroAdminSelectUser/index.vue";
+import Segmented from "@/components/ReSegmented";
+import { statusOptions } from "@/views/system/dept/utils/enums";
 
 const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({
@@ -15,7 +17,7 @@ const props = withDefaults(defineProps<FormProps>(), {
     leader: [],
     name: "",
     sort: 0,
-    status: 1,
+    status: true,
     description: ""
   })
 });
@@ -93,23 +95,23 @@ defineExpose({ getRef });
       </re-col>
       <re-col :value="12" :xs="24" :sm="24">
         <el-form-item label="部门状态">
-          <el-switch
-            v-model="newFormInline.status"
-            inline-prompt
-            :active-value="1"
-            :inactive-value="0"
-            active-text="启用"
-            inactive-text="停用"
-            :style="switchStyle"
+          <Segmented
+            :modelValue="newFormInline.status ? 0 : 1"
+            :options="statusOptions"
+            @change="
+              ({ option: { value } }) => {
+                newFormInline.status = value;
+              }
+            "
           />
         </el-form-item>
       </re-col>
 
       <re-col>
-        <el-form-item label="备注">
+        <el-form-item label="描述信息" prop="description">
           <el-input
             v-model="newFormInline.description"
-            placeholder="请输入备注信息"
+            placeholder="请输入描述信息"
             type="textarea"
           />
         </el-form-item>

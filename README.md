@@ -15,7 +15,7 @@
 
 ## 预览
 
-<a href="https://cplinux98.github.io/zero-admin-ui-pure/#/login" target="_blank" rel="noopener noreferrer">查看预览</a>
+[查看预览](https://cplinux98.github.io/zero-admin-ui-pure/#/login) （建议右键选择“在新标签页中打开”）
 
 用户名：admin
 密码：admin123

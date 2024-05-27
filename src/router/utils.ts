@@ -191,7 +191,7 @@ function handleAsyncRoutes(routeList) {
 
 /** 初始化路由（`new Promise` 写法防止在异步请求中造成无限循环）*/
 function initRouter() {
-  console.log(getConfig()?.CachingAsyncRoutes);
+  // console.log(getConfig());
   if (getConfig()?.CachingAsyncRoutes) {
     // 开启动态路由缓存本地localStorage
     const key = "async-routes";
@@ -212,10 +212,16 @@ function initRouter() {
     }
   } else {
     return new Promise(resolve => {
-      getAsyncRoutes().then(({ data }) => {
-        handleAsyncRoutes(cloneDeep(data));
-        resolve(router);
-      });
+      // console.log(resolve);
+      getAsyncRoutes()
+        .then(({ data }) => {
+          // console.log(data);
+          handleAsyncRoutes(cloneDeep(data));
+          resolve(router);
+        })
+        .catch(e => {
+          console.error(e);
+        });
     });
   }
 }

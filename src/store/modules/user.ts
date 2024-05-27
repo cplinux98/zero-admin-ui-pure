@@ -62,14 +62,25 @@ export const useUserStore = defineStore({
     /** 登入 */
     loginByUsername(data: LoginRequest) {
       return new Promise<LoginResult>(async (resolve, reject) => {
-        try {
-          const response = await login(data);
-          setToken(response.data);
-          console.log(response);
-          resolve(response);
-        } catch (error) {
-          reject(error);
-        }
+        login(data)
+          .then(data => {
+            if (data.code === 200) {
+              setToken(data.data);
+              resolve(data);
+            }
+          })
+          .catch(error => {
+            reject(error);
+          });
+
+        // try {
+        //   const response = await login(data);
+        //   setToken(response.data);
+        //   console.log(response);
+        //   resolve(response);
+        // } catch (error) {
+        //   reject(error);
+        // }
 
         //   getLogin(data)
         //     .then(data => {

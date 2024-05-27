@@ -55,7 +55,7 @@ export function setToken(data: LoginResultData) {
   expires > 0
     ? Cookies.set(TokenKey, cookieString, {
         // expires: (expires - Date.now()) / 86400000
-        expires: (expires - Math.floor(Date.now() / 1000)) / 86400000 // 后端传递的过期时间戳为秒级
+        expires: (expires - Math.floor(Date.now() / 1000)) / 86400 // 设置cookies过期时间
       })
     : Cookies.set(TokenKey, cookieString);
 

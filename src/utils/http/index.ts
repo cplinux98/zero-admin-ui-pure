@@ -256,6 +256,10 @@ class PureHttp {
             message(`网络异常：${error}`, { type: "error" });
           }
 
+          if (error.response && error.response.status === 401) {
+            message("未认证，请认证后重试", { type: "error" });
+          }
+
           if (
             error.response &&
             error.response.status >= 400 &&

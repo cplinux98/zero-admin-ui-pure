@@ -15,8 +15,9 @@ import {
 // } from "@/api/user";
 import { useMultiTagsStoreHook } from "./multiTags";
 import { type DataInfo, setToken, removeToken, userKey } from "@/utils/auth";
-import { login, refreshToken } from "@/api/login";
+import { login, logout, refreshToken } from "@/api/login";
 import type { LoginRequest, LoginResult } from "@/api/login/type";
+import { message } from "@/utils/message";
 
 export const useUserStore = defineStore({
   id: "pure-user",
@@ -92,14 +93,23 @@ export const useUserStore = defineStore({
         //     });
       });
     },
-    /** 前端登出（不调用接口） */
+    /** 前端登出 */
     logOut() {
       this.username = "";
       this.roles = [];
-      removeToken();
-      useMultiTagsStoreHook().handleTags("equal", [...routerArrays]);
-      resetRouter();
-      router.push("/login");
+      // 调用注销登录接口
+      logout()
+        .then(({ code }) => {
+          if (code === 200) {
+            message("退出成功", { type: "success" });
+          }
+        })
+        .finally(() => {
+          removeToken();
+          useMultiTagsStoreHook().handleTags("equal", [...routerArrays]);
+          resetRouter();
+          router.push("/login");
+        });
     },
     /** 刷新`token` */
     async handRefreshToken(data) {

@@ -14,7 +14,8 @@ import { vitePluginFakeServer } from "vite-plugin-fake-server";
 
 export function getPluginsList(
   VITE_CDN: boolean,
-  VITE_COMPRESSION: ViteCompression
+  VITE_COMPRESSION: ViteCompression,
+  VITE_MOCK_DEV_SERVER: boolean
 ): PluginOption[] {
   const lifecycle = process.env.npm_lifecycle_event;
   return [
@@ -29,12 +30,14 @@ export function getPluginsList(
      */
     removeNoMatch(),
     // mock支持
-    vitePluginFakeServer({
-      logger: false,
-      include: "mock",
-      infixName: false,
-      enableProd: true
-    }),
+    VITE_MOCK_DEV_SERVER
+      ? vitePluginFakeServer({
+          logger: false,
+          include: "mock",
+          infixName: false,
+          enableProd: true
+        })
+      : null,
     // 自定义主题
     themePreprocessorPlugin({
       scss: {

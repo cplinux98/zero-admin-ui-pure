@@ -437,8 +437,8 @@ export default defineFakeRoute([
   },
   // 菜单管理
   {
-    url: "/menu",
-    method: "post",
+    url: "/api/v2/system/menu",
+    method: "get",
     response: () => {
       return {
         code: 200,
@@ -1199,8 +1199,8 @@ export default defineFakeRoute([
   },
   // 部门管理
   {
-    url: "/dept",
-    method: "post",
+    url: "/api/v1/system/dept",
+    method: "get",
     response: () => {
       return {
         code: 200,

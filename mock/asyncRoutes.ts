@@ -52,8 +52,7 @@ const systemMonitorRouter = {
       name: "OnlineUser",
       meta: {
         icon: "ri:user-voice-line",
-        title: "在线用户",
-        roles: ["admin"]
+        title: "在线用户"
       }
     },
     {
@@ -62,8 +61,7 @@ const systemMonitorRouter = {
       name: "LoginLog",
       meta: {
         icon: "ri:window-line",
-        title: "登录日志",
-        roles: ["admin"]
+        title: "登录日志"
       }
     },
     {
@@ -72,8 +70,7 @@ const systemMonitorRouter = {
       name: "OperationLog",
       meta: {
         icon: "ri:history-fill",
-        title: "操作日志",
-        roles: ["admin"]
+        title: "操作日志"
       }
     },
     {
@@ -82,8 +79,7 @@ const systemMonitorRouter = {
       name: "SystemLog",
       meta: {
         icon: "ri:file-search-line",
-        title: "系统日志",
-        roles: ["admin"]
+        title: "系统日志"
       }
     }
   ]
@@ -102,8 +98,7 @@ const systemManagementRouter = {
       name: "SystemUser",
       meta: {
         icon: "ri:admin-line",
-        title: "用户管理",
-        roles: ["admin"]
+        title: "用户管理"
       }
     },
     {
@@ -111,8 +106,7 @@ const systemManagementRouter = {
       name: "SystemRole",
       meta: {
         icon: "ri:admin-fill",
-        title: "角色管理",
-        roles: ["admin"]
+        title: "角色管理"
       }
     },
     {
@@ -120,8 +114,7 @@ const systemManagementRouter = {
       name: "SystemMenu",
       meta: {
         icon: "ep:menu",
-        title: "菜单管理",
-        roles: ["admin"]
+        title: "菜单管理"
       }
     },
     {
@@ -129,8 +122,7 @@ const systemManagementRouter = {
       name: "SystemDept",
       meta: {
         icon: "ri:git-branch-line",
-        title: "部门管理",
-        roles: ["admin"]
+        title: "部门管理"
       }
     }
   ]
@@ -138,7 +130,7 @@ const systemManagementRouter = {
 
 export default defineFakeRoute([
   {
-    url: "/api/v22/system/route",
+    url: "/api/v2/system/route",
     method: "get",
     response: () => {
       return {

@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "NODE_OPTIONS=--max-old-space-size=4096 vite --host=127.0.0.1",
     "serve": "pnpm dev",
+    "build:githubPages": "rimraf dist && NODE_OPTIONS=--max-old-space-size=8192 vite build --mode github.pages",
     "build": "rimraf dist && NODE_OPTIONS=--max-old-space-size=8192 vite build",
     "build:staging": "rimraf dist && vite build --mode staging",
     "report": "rimraf dist && vite build",

@@ -7,14 +7,16 @@ import {
   routerArrays,
   storageLocal
 } from "../utils";
-import {
-  type UserResult,
-  type RefreshTokenResult,
-  getLogin,
-  refreshTokenApi
-} from "@/api/user";
+// import {
+//   type UserResult,
+//   type RefreshTokenResult,
+//   getLogin,
+//   refreshTokenApi
+// } from "@/api/user";
 import { useMultiTagsStoreHook } from "./multiTags";
 import { type DataInfo, setToken, removeToken, userKey } from "@/utils/auth";
+import { login, refreshToken } from "@/api/login";
+import type { LoginRequest, LoginResult } from "@/api/login/type";
 
 export const useUserStore = defineStore({
   id: "pure-user",
@@ -58,13 +60,13 @@ export const useUserStore = defineStore({
       this.loginDay = Number(value);
     },
     /** 登入 */
-    loginByUsername(data) {
-      return new Promise<UserResult>(async (resolve, reject) => {
+    loginByUsername(data: LoginRequest) {
+      return new Promise<LoginResult>(async (resolve, reject) => {
         try {
-          const response = await getLogin(data);
+          const response = await login(data);
           setToken(response.data);
-          console.log(data);
-          resolve(data);
+          console.log(response);
+          resolve(response);
         } catch (error) {
           reject(error);
         }
@@ -90,8 +92,8 @@ export const useUserStore = defineStore({
     },
     /** 刷新`token` */
     async handRefreshToken(data) {
-      return new Promise<RefreshTokenResult>((resolve, reject) => {
-        refreshTokenApi(data)
+      return new Promise<LoginResult>((resolve, reject) => {
+        refreshToken(data)
           .then(data => {
             if (data) {
               setToken(data.data);
@@ -101,6 +103,16 @@ export const useUserStore = defineStore({
           .catch(error => {
             reject(error);
           });
+        // refreshTokenApi(data)
+        //   .then(data => {
+        //     if (data) {
+        //       setToken(data.data);
+        //       resolve(data);
+        //     }
+        //   })
+        //   .catch(error => {
+        //     reject(error);
+        //   });
       });
     }
   }

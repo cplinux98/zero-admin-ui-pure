@@ -1,7 +1,8 @@
 import { http } from "@/utils/http";
 
 export type UserResult = {
-  success: boolean;
+  code: number;
+  msg: string;
   data: {
     /** 头像 */
     avatar: string;
@@ -15,20 +16,21 @@ export type UserResult = {
     accessToken: string;
     /** 用于调用刷新`accessToken`的接口时所需的`token` */
     refreshToken: string;
-    /** `accessToken`的过期时间（格式'xxxx/xx/xx xx:xx:xx'） */
-    expires: Date;
+    /** `accessToken`的过期时间（秒级时间戳） */
+    expires: number;
   };
 };
 
 export type RefreshTokenResult = {
-  success: boolean;
+  code: number;
+  msg: string;
   data: {
     /** `token` */
     accessToken: string;
     /** 用于调用刷新`accessToken`的接口时所需的`token` */
     refreshToken: string;
-    /** `accessToken`的过期时间（格式'xxxx/xx/xx xx:xx:xx'） */
-    expires: Date;
+    /** `accessToken`的过期时间（秒级时间戳） */
+    expires: number;
   };
 };
 
@@ -39,5 +41,5 @@ export const getLogin = (data?: object) => {
 
 /** 刷新`token` */
 export const refreshTokenApi = (data?: object) => {
-  return http.request<RefreshTokenResult>("post", "/refresh-token", { data });
+  return http.request<RefreshTokenResult>("post", "/refreshToken", { data });
 };

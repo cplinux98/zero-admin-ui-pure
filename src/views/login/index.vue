@@ -17,6 +17,8 @@ import dayIcon from "@/assets/svg/day.svg?component";
 import darkIcon from "@/assets/svg/dark.svg?component";
 import Lock from "@iconify-icons/ri/lock-fill";
 import User from "@iconify-icons/ri/user-3-fill";
+import { LoginRequest } from "@/api/login/type";
+import { getLoginCaptcha } from "@/api/login";
 
 defineOptions({
   name: "Login"
@@ -24,7 +26,7 @@ defineOptions({
 const router = useRouter();
 const loading = ref(false);
 const ruleFormRef = ref<FormInstance>();
-
+const captchaBase64 = ref(); // 验证码图片Base64字符串
 const { initStorage } = useLayout();
 initStorage();
 
@@ -32,9 +34,11 @@ const { dataTheme, overallStyle, dataThemeChange } = useDataThemeChange();
 dataThemeChange(overallStyle.value);
 const { title } = useNav();
 
-const ruleForm = reactive({
+const ruleForm = reactive<LoginRequest>({
   username: "admin",
-  password: "admin123"
+  password: "admin123",
+  captchaCode: "",
+  captchaKey: ""
 });
 
 const onLogin = async (formEl: FormInstance | undefined) => {
@@ -43,10 +47,11 @@ const onLogin = async (formEl: FormInstance | undefined) => {
     if (valid) {
       loading.value = true;
       useUserStoreHook()
-        .loginByUsername({ username: ruleForm.username, password: "admin123" })
+        .loginByUsername(ruleForm)
         .then(res => {
-          if (res.success) {
+          if (res) {
             // 获取后端路由
+            console.log(res);
             return initRouter().then(() => {
               router.push(getTopMenu(true).path).then(() => {
                 message("登录成功", { type: "success" });
@@ -61,6 +66,18 @@ const onLogin = async (formEl: FormInstance | undefined) => {
   });
 };
 
+const getCaptcha = async () => {
+  try {
+    loading.value = true;
+    const { data } = await getLoginCaptcha();
+    captchaBase64.value = data.captchaBase64;
+    ruleForm.captchaKey = data.captchaKey;
+  } catch (e) {
+  } finally {
+    loading.value = false;
+  }
+};
+
 /** 使用公共函数，避免`removeEventListener`失效 */
 function onkeypress({ code }: KeyboardEvent) {
   if (code === "Enter") {
@@ -69,6 +86,7 @@ function onkeypress({ code }: KeyboardEvent) {
 }
 
 onMounted(() => {
+  getCaptcha();
   window.document.addEventListener("keypress", onkeypress);
 });
 
@@ -136,6 +154,25 @@ onBeforeUnmount(() => {
                   placeholder="密码"
                   :prefix-icon="useRenderIcon(Lock)"
                 />
+              </el-form-item>
+            </Motion>
+
+            <Motion :delay="200">
+              <el-form-item prop="captchaCode">
+                <el-input
+                  v-model="ruleForm.captchaCode"
+                  placeholder="请输入验证码"
+                  :prefix-icon="useRenderIcon('ri:shield-keyhole-line')"
+                  clearable
+                >
+                  <template v-slot:append>
+                    <el-image
+                      :src="captchaBase64"
+                      class="h-[40px]"
+                      @click="getCaptcha"
+                    />
+                  </template>
+                </el-input>
               </el-form-item>
             </Motion>
 

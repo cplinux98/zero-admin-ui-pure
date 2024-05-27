@@ -4,6 +4,7 @@ import { handleTree } from "@/utils/tree";
 import { message } from "@/utils/message";
 import {
   createDept,
+  deleteDept,
   getDept,
   getDeptList,
   updateDept
@@ -192,9 +193,16 @@ export function useDept() {
     });
   }
 
-  function handleDelete(row) {
-    message(`您删除了部门名称为${row.name}的这条数据`, { type: "success" });
-    onSearch();
+  async function handleDelete(row) {
+    try {
+      loading.value = true;
+      await deleteDept(row.id);
+      message(`您删除了部门名称为${row.name}的这条数据`, { type: "success" });
+      onSearch();
+    } catch (e) {
+    } finally {
+      loading.value = false;
+    }
   }
 
   onMounted(() => {

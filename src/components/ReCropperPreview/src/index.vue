@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import ReCropper from "@/components/ReCropper";
 import { formatBytes } from "@pureadmin/utils";
-
+// import type { ImageProps } from "element-plus";
 defineOptions({
   name: "ReCropperPreview"
 });
@@ -28,6 +28,14 @@ function onCropper({ base64, blob, info }) {
 function hidePopover() {
   popoverRef.value.hide();
 }
+
+// const fits = [
+//   "fill",
+//   "contain",
+//   "cover",
+//   "none",
+//   "scale-down"
+// ] as ImageProps["fit"][];
 
 defineExpose({ hidePopover });
 </script>
@@ -58,6 +66,7 @@ defineExpose({ hidePopover });
         <el-image
           v-if="cropperImg"
           :src="cropperImg"
+          :preview-teleported="true"
           :preview-src-list="Array.of(cropperImg)"
           fit="cover"
         />
@@ -74,3 +83,11 @@ defineExpose({ hidePopover });
     </el-popover>
   </div>
 </template>
+
+<style>
+.el-image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+}
+</style>

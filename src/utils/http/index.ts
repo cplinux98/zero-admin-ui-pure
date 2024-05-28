@@ -11,10 +11,13 @@ import type {
 } from "./types.d";
 import { stringify } from "qs";
 import NProgress from "../progress";
-import { getToken, formatToken } from "@/utils/auth";
+import { getToken, formatToken, removeToken } from "@/utils/auth";
 import { useUserStoreHook } from "@/store/modules/user";
 // import { ref } from "vue";
 import { message } from "@/utils/message";
+import router, { resetRouter } from "@/router";
+import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
+import { routerArrays } from "@/layout/types";
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
   // 请求超时时间
@@ -79,7 +82,8 @@ class PureHttp {
         const whiteList = [
           "/api/v1/system/login/refreshToken",
           "/api/v1/system/login",
-          "/api/v1/system/login/captcha"
+          "/api/v1/system/login/captcha",
+          "/api/v1/system/login/logout"
         ];
         return whiteList.some(url => config.url.endsWith(url))
           ? config
@@ -102,6 +106,10 @@ class PureHttp {
                         config.headers["Authorization"] = formatToken(token);
                         PureHttp.requests.forEach(cb => cb(token));
                         PureHttp.requests = [];
+                      })
+                      .catch(() => {
+                        // 刷新token失败，就代表token过期，过期了就应该退出系统
+                        useUserStoreHook().logOut();
                       })
                       .finally(() => {
                         PureHttp.isRefreshing = false;
@@ -257,6 +265,11 @@ class PureHttp {
           }
 
           if (error.response && error.response.status === 401) {
+            // 401后，执行登出相关操作，不能直接使用userStore，会造成死循环
+            removeToken();
+            useMultiTagsStoreHook().handleTags("equal", [...routerArrays]);
+            resetRouter();
+            router.push("/login");
             message("未认证，请认证后重试", { type: "error" });
           }
 
@@ -289,6 +302,25 @@ class PureHttp {
     config?: PureHttpRequestConfig
   ): Promise<T> {
     return this.request<T>("get", url, params, config);
+  }
+
+  public upload<T, P>(
+    url: string,
+    params?: AxiosRequestConfig<P>,
+    data?: AxiosRequestConfig<P>,
+    config?: PureHttpRequestConfig
+  ): Promise<T> {
+    return this.request<T>(
+      "post",
+      url,
+      { data, params },
+      {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        },
+        ...config
+      }
+    );
   }
 }
 

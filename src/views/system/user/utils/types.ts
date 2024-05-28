@@ -1,3 +1,5 @@
+import type { UserForm } from "@/api/system/user/type";
+
 interface FormItemProps {
   id?: number;
   /** 用于判断是`新增`还是`修改` */
@@ -10,7 +12,7 @@ interface FormItemProps {
   phone: string | number;
   email: string;
   sex: string | number;
-  status: number;
+  status: boolean;
   dept?: {
     id?: number;
     name?: string;
@@ -18,7 +20,7 @@ interface FormItemProps {
   remark: string;
 }
 interface FormProps {
-  formInline: FormItemProps;
+  formInline: UserForm;
 }
 
 interface RoleFormItemProps {

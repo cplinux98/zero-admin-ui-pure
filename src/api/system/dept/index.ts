@@ -18,7 +18,7 @@ export const getDeptList = (params?: DeptQuery) => {
 };
 
 /** 创建 */
-export const createDept = (data?: object) => {
+export const createDept = (data: object) => {
   return http.request<Result>("post", baseURLApiV1("/system/dept"), { data });
 };
 
@@ -31,7 +31,7 @@ export const getDept = (id: number) => {
 };
 
 /** 更新 */
-export const updateDept = (id?: number, data?: object) => {
+export const updateDept = (id: number, data: object) => {
   return http.request<Result>("put", baseURLApiV1("/system/dept/" + id), {
     data
   });

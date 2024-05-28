@@ -1,6 +1,7 @@
 import { h, onMounted, reactive, type Ref, ref, toRaw } from "vue";
 import { addDialog } from "@/components/ReDialog/index";
-import { getDeptList, getUserByIds, getUserList } from "@/api/system";
+import { getUserByIds, getUserList } from "@/api/system";
+import { getDeptList } from "@/api/system/dept";
 import type { PaginationProps } from "@pureadmin/table";
 import { deviceDetection } from "@pureadmin/utils";
 import selectUserView from "@/components/ZeroAdminSelectUser/selectUserView.vue";
@@ -83,8 +84,8 @@ export function useUser(
     const { data } = await getUserList(toRaw(form));
     dataList.value = data.list;
     pagination.total = data.total;
-    pagination.pageSize = data.pageSize;
-    pagination.currentPage = data.currentPage;
+    // pagination.pageSize = data.pageSize;
+    // pagination.currentPage = data.currentPage;
 
     setTimeout(() => {
       loading.value = false;
@@ -156,7 +157,8 @@ export function useUser(
   /** 根据selectedIds 获取选中用户信息 **/
   async function getSelectedUserData() {
     loading.value = true;
-    const { data } = await getUserByIds(selectedIds.value);
+    // selectedIds.value
+    const { data } = await getUserByIds();
     console.log(data);
     selectedUserData.value = data.list;
 

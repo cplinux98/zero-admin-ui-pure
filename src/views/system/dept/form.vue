@@ -95,14 +95,23 @@ defineExpose({ getRef });
       </re-col>
       <re-col :value="12" :xs="24" :sm="24">
         <el-form-item label="部门状态">
-          <Segmented
-            :modelValue="newFormInline.status ? 0 : 1"
-            :options="statusOptions"
-            @change="
-              ({ option: { value } }) => {
-                newFormInline.status = value;
-              }
-            "
+          <!--          <Segmented-->
+          <!--            :modelValue="newFormInline.status ? 0 : 1"-->
+          <!--            :options="statusOptions"-->
+          <!--            @change="-->
+          <!--              ({ option: { value } }) => {-->
+          <!--                newFormInline.status = value;-->
+          <!--              }-->
+          <!--            "-->
+          <!--          />-->
+          <el-switch
+            v-model="newFormInline.status"
+            inline-prompt
+            :active-value="true"
+            :inactive-value="false"
+            active-text="启用"
+            inactive-text="停用"
+            :style="switchStyle"
           />
         </el-form-item>
       </re-col>

@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import editForm from "../form.vue";
-import { handleTree } from "@/utils/tree";
+import { handleTreeWithSort } from "@/utils/tree";
 import { message } from "@/utils/message";
 import {
   createDept,
@@ -91,7 +91,7 @@ export function useDept() {
     //   // 前端搜索状态
     //   newData = newData.filter(item => item.status === form.status);
     // }
-    dataList.value = handleTree(data); // 处理成树结构
+    dataList.value = handleTreeWithSort(data); // 处理成树结构
     setTimeout(() => {
       loading.value = false;
     }, 500);

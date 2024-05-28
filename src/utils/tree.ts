@@ -186,3 +186,77 @@ export const handleTree = (
   }
   return tree;
 };
+
+/**
+ * @description 构造树型结构数据，并支持排序
+ * @param data 数据源
+ * @param id id字段 默认id
+ * @param parentId 父节点字段，默认parentId
+ * @param children 子节点字段，默认children
+ * @param sortField 排序字段，默认sort
+ * @returns 追加字段后的树
+ */
+export const handleTreeWithSort = (
+  data: any[],
+  id = "id",
+  parentId = "parentId",
+  children = "children",
+  sortField = "sort"
+) => {
+  if (!Array.isArray(data)) {
+    console.warn("data must be an array");
+    return [];
+  }
+
+  const config = {
+    id: id,
+    parentId: parentId,
+    childrenList: children
+  };
+
+  const childrenListMap: any = {};
+  const nodeIds: any = {};
+  const tree: any[] = [];
+
+  // 构建父节点到子节点的映射和所有节点的映射
+  for (const d of data) {
+    const pid = d[config.parentId];
+    if (!childrenListMap[pid]) {
+      childrenListMap[pid] = [];
+    }
+    nodeIds[d[config.id]] = d;
+    childrenListMap[pid].push(d);
+  }
+
+  // 构建树的根节点
+  for (const d of data) {
+    const pid = d[config.parentId];
+    if (!nodeIds[pid]) {
+      tree.push(d);
+    }
+  }
+
+  // 对根节点进行排序
+  tree.sort((a, b) => (a[sortField] ?? 0) - (b[sortField] ?? 0));
+
+  // 对树的每一层进行排序并构建子节点
+  for (const t of tree) {
+    adaptToChildrenList(t);
+  }
+
+  function adaptToChildrenList(node: any) {
+    const children = childrenListMap[node[config.id]];
+    if (children) {
+      // 对当前节点的子节点进行排序
+      children.sort(
+        (a: any, b: any) => (a[sortField] ?? 0) - (b[sortField] ?? 0)
+      );
+      node[config.childrenList] = children;
+      for (const child of children) {
+        adaptToChildrenList(child);
+      }
+    }
+  }
+
+  return tree;
+};

@@ -10,20 +10,28 @@ export type Result<T = any> = {
   data?: T;
 };
 
-export type ResultTable = {
+export type ResultTable<T = any> = {
   code: number;
   msg: string;
   data?: {
     /** 列表数据 */
-    list: Array<any>;
+    list: T;
     /** 总条目数 */
     total?: number;
-    /** 每页显示条目个数 */
-    pageSize?: number;
-    /** 当前页数 */
-    currentPage?: number;
+    // /** 每页显示条目个数 */
+    // pageSize?: number;
+    // /** 当前页数 */
+    // currentPage?: number;
   };
 };
+
+/** 分页查询参数 **/
+export interface PageQuery {
+  /** 页码 **/
+  page: number;
+  /** 页数 **/
+  pageSize: number;
+}
 
 export const baseURLApiV1 = (url: string) => {
   return `/api/v1${url}`;

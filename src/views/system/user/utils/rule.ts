@@ -4,10 +4,12 @@ import { isPhone, isEmail } from "@pureadmin/utils";
 
 /** 自定义表单规则校验 */
 export const formRules = reactive(<FormRules>{
+  deptId: [{ required: true, message: "归属部门为必填项", trigger: "blur" }],
   nickname: [{ required: true, message: "用户昵称为必填项", trigger: "blur" }],
   username: [{ required: true, message: "用户名称为必填项", trigger: "blur" }],
   password: [{ required: true, message: "用户密码为必填项", trigger: "blur" }],
-  phone: [
+  mobile: [
+    { required: true, message: "手机号码为必填项", trigger: "blur" },
     {
       validator: (rule, value, callback) => {
         if (value === "") {
@@ -23,6 +25,7 @@ export const formRules = reactive(<FormRules>{
     }
   ],
   email: [
+    { required: true, message: "邮箱为必填项", trigger: "blur" },
     {
       validator: (rule, value, callback) => {
         if (value === "") {

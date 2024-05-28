@@ -68,20 +68,12 @@ const {
         :model="form"
         class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px] overflow-auto"
       >
-        <el-form-item label="用户名称：" prop="username">
+        <el-form-item label="关键词：" prop="keyword">
           <el-input
-            v-model="form.username"
-            placeholder="请输入用户名称"
+            v-model="form.keyword"
+            placeholder="请输入用户名/手机号/用户昵称"
             clearable
-            class="!w-[180px]"
-          />
-        </el-form-item>
-        <el-form-item label="手机号码：" prop="phone">
-          <el-input
-            v-model="form.phone"
-            placeholder="请输入手机号码"
-            clearable
-            class="!w-[180px]"
+            class="!w-[220px]"
           />
         </el-form-item>
         <el-form-item label="状态：" prop="status">
@@ -91,8 +83,8 @@ const {
             clearable
             class="!w-[180px]"
           >
-            <el-option label="已开启" value="1" />
-            <el-option label="已关闭" value="0" />
+            <el-option label="已开启" :value="true" />
+            <el-option label="已关闭" :value="false" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -149,6 +141,7 @@ const {
               </template>
             </el-popconfirm>
           </div>
+          <!--                      showOverflowTooltip-->
           <pure-table
             ref="tableRef"
             row-key="id"
@@ -171,82 +164,85 @@ const {
             @page-current-change="handleCurrentChange"
           >
             <template #operation="{ row }">
-              <el-button
-                class="reset-margin"
-                link
-                type="primary"
-                :size="size"
-                :icon="useRenderIcon(EditPen)"
-                @click="openDialog('修改', row)"
-              >
-                修改
-              </el-button>
-              <el-popconfirm
-                :title="`是否确认删除用户编号为${row.id}的这条数据`"
-                @confirm="handleDelete(row)"
-              >
-                <template #reference>
-                  <el-button
-                    class="reset-margin"
-                    link
-                    type="primary"
-                    :size="size"
-                    :icon="useRenderIcon(Delete)"
-                  >
-                    删除
-                  </el-button>
-                </template>
-              </el-popconfirm>
-              <el-dropdown>
+              <!--              系统内置的admin不允许修改-->
+              <div v-if="row.id != 1">
                 <el-button
-                  class="ml-3 mt-[2px]"
+                  class="reset-margin"
                   link
                   type="primary"
                   :size="size"
-                  :icon="useRenderIcon(More)"
-                  @click="handleUpdate(row)"
-                />
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item>
-                      <el-button
-                        :class="buttonClass"
-                        link
-                        type="primary"
-                        :size="size"
-                        :icon="useRenderIcon(Upload)"
-                        @click="handleUpload(row)"
-                      >
-                        上传头像
-                      </el-button>
-                    </el-dropdown-item>
-                    <el-dropdown-item>
-                      <el-button
-                        :class="buttonClass"
-                        link
-                        type="primary"
-                        :size="size"
-                        :icon="useRenderIcon(Password)"
-                        @click="handleReset(row)"
-                      >
-                        重置密码
-                      </el-button>
-                    </el-dropdown-item>
-                    <el-dropdown-item>
-                      <el-button
-                        :class="buttonClass"
-                        link
-                        type="primary"
-                        :size="size"
-                        :icon="useRenderIcon(Role)"
-                        @click="handleRole(row)"
-                      >
-                        分配角色
-                      </el-button>
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
+                  :icon="useRenderIcon(EditPen)"
+                  @click="openDialog(row.id)"
+                >
+                  修改
+                </el-button>
+                <el-popconfirm
+                  :title="`是否确认删除用户编号为${row.id}的这条数据`"
+                  @confirm="handleDelete(row)"
+                >
+                  <template #reference>
+                    <el-button
+                      class="reset-margin"
+                      link
+                      type="primary"
+                      :size="size"
+                      :icon="useRenderIcon(Delete)"
+                    >
+                      删除
+                    </el-button>
+                  </template>
+                </el-popconfirm>
+                <el-dropdown>
+                  <el-button
+                    class="ml-3 mt-[2px]"
+                    link
+                    type="primary"
+                    :size="size"
+                    :icon="useRenderIcon(More)"
+                    @click="handleUpdate(row)"
+                  />
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <el-dropdown-item>
+                        <el-button
+                          :class="buttonClass"
+                          link
+                          type="primary"
+                          :size="size"
+                          :icon="useRenderIcon(Upload)"
+                          @click="handleUpload(row)"
+                        >
+                          上传头像
+                        </el-button>
+                      </el-dropdown-item>
+                      <el-dropdown-item>
+                        <el-button
+                          :class="buttonClass"
+                          link
+                          type="primary"
+                          :size="size"
+                          :icon="useRenderIcon(Password)"
+                          @click="handleReset(row)"
+                        >
+                          重置密码
+                        </el-button>
+                      </el-dropdown-item>
+                      <el-dropdown-item>
+                        <el-button
+                          :class="buttonClass"
+                          link
+                          type="primary"
+                          :size="size"
+                          :icon="useRenderIcon(Role)"
+                          @click="handleRole(row)"
+                        >
+                          分配角色
+                        </el-button>
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+              </div>
             </template>
           </pure-table>
         </template>

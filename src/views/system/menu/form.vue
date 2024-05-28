@@ -5,17 +5,10 @@ import { formRules } from "./utils/rule";
 import { FormProps } from "./utils/types";
 import { IconSelect } from "@/components/ReIcon";
 import Segmented from "@/components/ReSegmented";
-import {
-  menuTypeOptions,
-  showLinkOptions,
-  fixedTagOptions,
-  keepAliveOptions,
-  hiddenTagOptions,
-  showParentOptions,
-  frameLoadingOptions
-} from "./utils/enums";
+import { menuTypeOptions } from "./utils/enums";
 import { useMenu } from "@/views/system/menu/utils/hook";
-
+import { usePublicHooks } from "@/views/system/hooks";
+const { switchStyle } = usePublicHooks();
 const { getHigherMenuOptions } = useMenu();
 const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({
@@ -249,15 +242,25 @@ defineExpose({ getRef });
       </re-col>
       <re-col v-if="newFormInline.menuType === 1" :value="12" :xs="24" :sm="24">
         <el-form-item label="加载蒙版">
-          <Segmented
-            :modelValue="newFormInline.frameLoading ? 0 : 1"
-            :options="frameLoadingOptions"
-            @change="
-              ({ option: { value } }) => {
-                newFormInline.frameLoading = value;
-              }
-            "
+          <el-switch
+            v-model="newFormInline.frameLoading"
+            inline-prompt
+            :active-value="true"
+            :inactive-value="false"
+            active-text="开启"
+            inactive-text="关闭"
+            :style="switchStyle"
           />
+
+          <!--          <Segmented-->
+          <!--            :modelValue="newFormInline.frameLoading ? 0 : 1"-->
+          <!--            :options="frameLoadingOptions"-->
+          <!--            @change="-->
+          <!--              ({ option: { value } }) => {-->
+          <!--                newFormInline.frameLoading = value;-->
+          <!--              }-->
+          <!--            "-->
+          <!--          />-->
         </el-form-item>
       </re-col>
 
@@ -267,16 +270,25 @@ defineExpose({ getRef });
         :xs="24"
         :sm="24"
       >
-        <el-form-item label="菜单">
-          <Segmented
-            :modelValue="newFormInline.showLink ? 0 : 1"
-            :options="showLinkOptions"
-            @change="
-              ({ option: { value } }) => {
-                newFormInline.showLink = value;
-              }
-            "
+        <el-form-item label="显示菜单">
+          <el-switch
+            v-model="newFormInline.showLink"
+            inline-prompt
+            :active-value="true"
+            :inactive-value="false"
+            active-text="显示"
+            inactive-text="隐藏"
+            :style="switchStyle"
           />
+          <!--          <Segmented-->
+          <!--            :modelValue="newFormInline.showLink ? 0 : 1"-->
+          <!--            :options="showLinkOptions"-->
+          <!--            @change="-->
+          <!--              ({ option: { value } }) => {-->
+          <!--                newFormInline.showLink = value;-->
+          <!--              }-->
+          <!--            "-->
+          <!--          />-->
         </el-form-item>
       </re-col>
       <re-col
@@ -286,56 +298,94 @@ defineExpose({ getRef });
         :sm="24"
       >
         <el-form-item label="父级菜单">
-          <Segmented
-            :modelValue="newFormInline.showParent ? 0 : 1"
-            :options="showParentOptions"
-            @change="
-              ({ option: { value } }) => {
-                newFormInline.showParent = value;
-              }
-            "
+          <el-switch
+            v-model="newFormInline.showParent"
+            inline-prompt
+            :active-value="true"
+            :inactive-value="false"
+            active-text="显示"
+            inactive-text="不显示"
+            :style="switchStyle"
           />
+          <!--          <Segmented-->
+          <!--            :modelValue="newFormInline.showParent ? 0 : 1"-->
+          <!--            :options="showParentOptions"-->
+          <!--            @change="-->
+          <!--              ({ option: { value } }) => {-->
+          <!--                newFormInline.showParent = value;-->
+          <!--              }-->
+          <!--            "-->
+          <!--          />-->
         </el-form-item>
       </re-col>
 
       <re-col v-show="newFormInline.menuType < 2" :value="12" :xs="24" :sm="24">
         <el-form-item label="缓存页面">
-          <Segmented
-            :modelValue="newFormInline.keepAlive ? 0 : 1"
-            :options="keepAliveOptions"
-            @change="
-              ({ option: { value } }) => {
-                newFormInline.keepAlive = value;
-              }
-            "
+          <el-switch
+            v-model="newFormInline.keepAlive"
+            inline-prompt
+            :active-value="true"
+            :inactive-value="false"
+            active-text="缓存"
+            inactive-text="不缓存"
+            :style="switchStyle"
           />
+
+          <!--          <Segmented-->
+          <!--            :modelValue="newFormInline.keepAlive ? 0 : 1"-->
+          <!--            :options="keepAliveOptions"-->
+          <!--            @change="-->
+          <!--              ({ option: { value } }) => {-->
+          <!--                newFormInline.keepAlive = value;-->
+          <!--              }-->
+          <!--            "-->
+          <!--          />-->
         </el-form-item>
       </re-col>
 
       <re-col v-show="newFormInline.menuType < 2" :value="12" :xs="24" :sm="24">
         <el-form-item label="标签页">
-          <Segmented
-            :modelValue="newFormInline.hiddenTag ? 1 : 0"
-            :options="hiddenTagOptions"
-            @change="
-              ({ option: { value } }) => {
-                newFormInline.hiddenTag = value;
-              }
-            "
+          <el-switch
+            v-model="newFormInline.hiddenTag"
+            inline-prompt
+            :active-value="false"
+            :inactive-value="true"
+            active-text="显示"
+            inactive-text="不显示"
+            :style="switchStyle"
           />
+
+          <!--          <Segmented-->
+          <!--            :modelValue="newFormInline.hiddenTag ? 1 : 0"-->
+          <!--            :options="hiddenTagOptions"-->
+          <!--            @change="-->
+          <!--              ({ option: { value } }) => {-->
+          <!--                newFormInline.hiddenTag = value;-->
+          <!--              }-->
+          <!--            "-->
+          <!--          />-->
         </el-form-item>
       </re-col>
       <re-col v-show="newFormInline.menuType < 2" :value="12" :xs="24" :sm="24">
         <el-form-item label="固定标签页">
-          <Segmented
-            :modelValue="newFormInline.fixedTag ? 0 : 1"
-            :options="fixedTagOptions"
-            @change="
-              ({ option: { value } }) => {
-                newFormInline.fixedTag = value;
-              }
-            "
+          <el-switch
+            v-model="newFormInline.fixedTag"
+            inline-prompt
+            :active-value="true"
+            :inactive-value="false"
+            active-text="固定"
+            inactive-text="不固定"
+            :style="switchStyle"
           />
+          <!--          <Segmented-->
+          <!--            :modelValue="newFormInline.fixedTag ? 0 : 1"-->
+          <!--            :options="fixedTagOptions"-->
+          <!--            @change="-->
+          <!--              ({ option: { value } }) => {-->
+          <!--                newFormInline.fixedTag = value;-->
+          <!--              }-->
+          <!--            "-->
+          <!--          />-->
         </el-form-item>
       </re-col>
     </el-row>

@@ -1,5 +1,5 @@
 <script setup lang="tsx">
-import { ref } from "vue";
+import { nextTick, onMounted, ref, watch } from "vue";
 import ReCropper from "@/components/ReCropper";
 import { formatBytes } from "@pureadmin/utils";
 // import type { ImageProps } from "element-plus";
@@ -18,6 +18,8 @@ const popoverRef = ref();
 const refCropper = ref();
 const showPopover = ref(false);
 const cropperImg = ref<string>("");
+const popoverStyle = ref({});
+const referenceRef = ref();
 
 function onCropper({ base64, blob, info }) {
   infos.value = info;
@@ -28,14 +30,30 @@ function onCropper({ base64, blob, info }) {
 function hidePopover() {
   popoverRef.value.hide();
 }
+// 获取左侧剪裁窗口的距离上下边框的高度，设置预览窗口的距离上下边框的高度
+function updatePopoverStyle() {
+  nextTick(() => {
+    const referenceElement = referenceRef.value;
+    if (referenceElement) {
+      const rect = referenceElement.getBoundingClientRect();
+      const distanceFromTop = rect.top;
+      const distanceFromBottom = window.innerHeight - rect.bottom;
 
-// const fits = [
-//   "fill",
-//   "contain",
-//   "cover",
-//   "none",
-//   "scale-down"
-// ] as ImageProps["fit"][];
+      popoverStyle.value = {
+        top: `${Math.max(distanceFromTop, 10)}px`, // 距离上边框至少10px
+        bottom: `${Math.max(distanceFromBottom, 10)}px` // 距离下边框至少10px
+      };
+    }
+  });
+}
+
+onMounted(() => {
+  watch(showPopover, newVal => {
+    if (newVal) {
+      updatePopoverStyle();
+    }
+  });
+});
 
 defineExpose({ hidePopover });
 </script>
@@ -47,9 +65,10 @@ defineExpose({ hidePopover });
       :visible="showPopover"
       placement="right"
       width="18vw"
+      :popper-style="popoverStyle"
     >
       <template #reference>
-        <div class="w-[18vw]">
+        <div ref="referenceRef" class="w-[18vw]">
           <ReCropper
             ref="refCropper"
             :src="props.imgSrc"
@@ -66,7 +85,6 @@ defineExpose({ hidePopover });
         <el-image
           v-if="cropperImg"
           :src="cropperImg"
-          :preview-teleported="true"
           :preview-src-list="Array.of(cropperImg)"
           fit="cover"
         />
@@ -83,11 +101,3 @@ defineExpose({ hidePopover });
     </el-popover>
   </div>
 </template>
-
-<style>
-.el-image img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: cover;
-}
-</style>

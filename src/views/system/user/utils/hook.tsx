@@ -402,10 +402,10 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         h(ReCropperPreview, {
           ref: cropRef,
           imgSrc: row.avatar || userAvatar,
-          onCropper: info => (avatarInfo.value = info),
-          circled: true,
-          quality: 1,
-          canvasOption: { width: 512, height: 512 }
+          onCropper: info => (avatarInfo.value = info)
+          // circled: true,
+          // quality: 1,
+          // canvasOption: { width: 512, height: 512 }
         }),
       beforeSure: done => {
         const avatarFile = new File([avatarInfo.value.blob], "avatar.png", {

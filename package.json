@@ -55,7 +55,7 @@
     "@vueuse/core": "^10.9.0",
     "@vueuse/motion": "^2.1.0",
     "@zxcvbn-ts/core": "^3.0.4",
-    "cropperjs": "^1.6.1",
+    "cropperjs": "^1.6.2",
     "vue-json-pretty": "^2.4.0",
     "animate.css": "^4.1.1",
     "axios": "^1.6.8",

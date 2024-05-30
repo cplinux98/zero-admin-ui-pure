@@ -33,7 +33,7 @@ importers:
         specifier: ^1.6.8
         version: 1.6.8
       cropperjs:
-        specifier: ^1.6.1
+        specifier: ^1.6.2
         version: 1.6.2
       dayjs:
         specifier: ^1.11.11

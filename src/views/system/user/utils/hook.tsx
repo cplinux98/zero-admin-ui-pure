@@ -408,13 +408,15 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
           // canvasOption: { width: 512, height: 512 }
         }),
       beforeSure: done => {
+        // 这里的fileName无所谓，后端会使用uuid重置头像名称
         const avatarFile = new File([avatarInfo.value.blob], "avatar.png", {
           type: avatarInfo.value.blob.type,
           lastModified: Date.now()
         });
+        // console.log("裁剪后的图片信息：", avatarInfo.value);
         const data = new FormData();
         data.append("file", avatarFile);
-        uploadUserAvatar(row.id, avatarFile).then(() => {
+        uploadUserAvatar(row.id, data).then(() => {
           done(); // 关闭弹框
           onSearch(); // 刷新表格数据
         });

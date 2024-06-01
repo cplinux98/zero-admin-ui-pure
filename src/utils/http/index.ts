@@ -18,6 +18,7 @@ import { message } from "@/utils/message";
 import router, { resetRouter } from "@/router";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
 import { routerArrays } from "@/layout/types";
+// import { P, T } from "@vueuse/motion/dist/shared/motion.5ee44005";
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
   // 请求超时时间
@@ -307,7 +308,7 @@ class PureHttp {
   public upload<T, P>(
     url: string,
     params?: AxiosRequestConfig<P>,
-    data?: AxiosRequestConfig<P>,
+    data?: FormData,
     config?: PureHttpRequestConfig
   ): Promise<T> {
     return this.request<T>(

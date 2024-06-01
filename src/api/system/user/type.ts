@@ -93,3 +93,55 @@ export interface UserResetPasswordForm {
   /** 新密码 */
   password: string;
 }
+
+export interface SelfUserInfo {
+  /** 用户头像 */
+  avatar: string;
+  /** 用户名 */
+  username: string;
+  /** 昵称 */
+  nickname: string;
+  /** 描述 */
+  description: string;
+  /** 角色名称列表 */
+  roleNames: string[];
+  /** 手机号 */
+  mobile: string;
+  /** 邮箱 */
+  email: string;
+  /** 所属部门名称 */
+  deptName: string;
+  /** 创建时间 */
+  createTime: number;
+  /** 更新时间 */
+  updateTime: number;
+}
+
+/**
+ * 用户本人信息返回结果类型
+ */
+export type SelfUserInfoResult = Result<SelfUserInfo>;
+
+/**
+ * 用户本人修改基本信息请求表单
+ */
+export interface SelfUserInfoForm {
+  /** 昵称 */
+  nickname: string;
+  /** 描述 */
+  description?: string;
+  /** 手机号 */
+  mobile: string;
+  /** 邮箱 */
+  email: string;
+}
+
+/**
+ * 更新头像表单
+ */
+export interface UploadAvatarForm {
+  /** 用户id，不传则修改自己 */
+  id?: number;
+  /** 图片文件 */
+  file: File;
+}

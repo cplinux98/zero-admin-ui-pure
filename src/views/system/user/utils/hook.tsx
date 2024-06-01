@@ -37,6 +37,7 @@ import {
 } from "element-plus";
 import { type Ref, h, ref, watch, computed, reactive, onMounted } from "vue";
 import type {
+  UploadAvatarForm,
   UserForm,
   UserQuery,
   UserResetPasswordForm
@@ -413,12 +414,15 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
           type: avatarInfo.value.blob.type,
           lastModified: Date.now()
         });
-        // console.log("裁剪后的图片信息：", avatarInfo.value);
-        const data = new FormData();
-        data.append("file", avatarFile);
-        uploadUserAvatar(row.id, data).then(() => {
+
+        const req: UploadAvatarForm = {
+          id: row.id,
+          file: avatarFile
+        };
+
+        uploadUserAvatar(req).then(() => {
           done(); // 关闭弹框
-          onSearch(); // 刷新表格数据
+          onSearch(); // 刷新数据
         });
 
         // console.log("裁剪后的图片信息：", avatarInfo.value);

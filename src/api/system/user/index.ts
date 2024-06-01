@@ -10,6 +10,11 @@ import type {
   UserDetailResult,
   UserResetPasswordForm
 } from "@/api/system/user/type";
+import type {
+  SelfUserInfoForm,
+  SelfUserInfoResult
+} from "@/api/system/user/type";
+import type { UploadAvatarForm } from "@/api/system/user/type";
 
 /** 列表 */
 export const getUserList = (params?: UserQuery) => {
@@ -53,10 +58,31 @@ export const resetUserPassword = (id: number, data: UserResetPasswordForm) => {
 };
 
 /** 上传用户头像 */
-export const uploadUserAvatar = (id: number, data: object) => {
+export const uploadUserAvatar = (data: UploadAvatarForm) => {
+  const formData = new FormData();
+  if (data.id) {
+    formData.append("id", data.id.toString());
+  }
+  formData.append("file", data.file);
+
   return http.upload<Result, any>(
-    baseURLApiV1("/system/user/" + id + "/uploadAvatar"),
+    baseURLApiV1("/system/user/uploadAvatar"),
     {},
-    data
+    formData
   );
+};
+
+/** 获取当前用户信息 */
+export const getSelfUserInfo = () => {
+  return http.request<SelfUserInfoResult>(
+    "get",
+    baseURLApiV1("/system/user/self")
+  );
+};
+
+/** 更新当前用户信息 */
+export const updateSelfUserInfo = (data: SelfUserInfoForm) => {
+  return http.request<Result>("patch", baseURLApiV1("/system/user/self"), {
+    data
+  });
 };

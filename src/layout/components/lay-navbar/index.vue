@@ -8,6 +8,7 @@ import LaySidebarBreadCrumb from "../lay-sidebar/components/SidebarBreadCrumb.vu
 import LaySidebarTopCollapse from "../lay-sidebar/components/SidebarTopCollapse.vue";
 
 import LogoutCircleRLine from "@iconify-icons/ri/logout-circle-r-line";
+import UserFollowLine from "@iconify-icons/ri/user-follow-line";
 import Setting from "@iconify-icons/ri/settings-3-line";
 
 const {
@@ -19,7 +20,8 @@ const {
   username,
   userAvatar,
   avatarsStyle,
-  toggleSideBar
+  toggleSideBar,
+  toSelfUserInfo
 } = useNav();
 </script>
 
@@ -53,6 +55,10 @@ const {
           <p v-if="username" class="dark:text-white">{{ username }}</p>
         </span>
         <template #dropdown>
+          <el-dropdown-item @click="toSelfUserInfo">
+            <IconifyIconOffline :icon="UserFollowLine" style="margin: 5px" />
+            个人中心
+          </el-dropdown-item>
           <el-dropdown-menu class="logout">
             <el-dropdown-item @click="logout">
               <IconifyIconOffline

@@ -73,24 +73,6 @@ export const useUserStore = defineStore({
           .catch(error => {
             reject(error);
           });
-
-        // try {
-        //   const response = await login(data);
-        //   setToken(response.data);
-        //   console.log(response);
-        //   resolve(response);
-        // } catch (error) {
-        //   reject(error);
-        // }
-
-        //   getLogin(data)
-        //     .then(data => {
-        //       if (data?.success) setToken(data.data);
-        //       resolve(data);
-        //     })
-        //     .catch(error => {
-        //       reject(error);
-        //     });
       });
     },
     /** 前端登出 */

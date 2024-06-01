@@ -126,6 +126,11 @@ export function useNav() {
     return new URL("/logo.svg", import.meta.url).href;
   }
 
+  /** 个人中心 */
+  function toSelfUserInfo() {
+    router.push("/user/info/index");
+  }
+
   return {
     route,
     title,
@@ -152,6 +157,7 @@ export function useNav() {
     username,
     userAvatar,
     avatarsStyle,
-    tooltipEffect
+    tooltipEffect,
+    toSelfUserInfo
   };
 }

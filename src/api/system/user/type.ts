@@ -88,6 +88,8 @@ export type UserDetailResult = Result<UserForm>;
  * 重设密码
  */
 export interface UserResetPasswordForm {
+  /** 用户id，不传则修改自己 */
+  id?: number;
   /** 原始密码 */
   oldPassword?: string;
   /** 新密码 */

@@ -2,6 +2,7 @@
 // 假设从API获取当前用户的安全信息
 import { ElMessage } from "element-plus";
 import { ref } from "vue";
+import { useUserInfo } from "@/views/user/info/utils/hook";
 
 const securityInfo = ref({
   loginPassword:
@@ -14,6 +15,8 @@ const securityInfo = ref({
 const handleChange = (type: string) => {
   ElMessage.success(`${type}修改功能`);
 };
+
+const { handleResetPassword } = useUserInfo();
 </script>
 
 <template>
@@ -21,7 +24,7 @@ const handleChange = (type: string) => {
     <div class="security-item">
       <div class="label">登录密码</div>
       <div class="info">{{ securityInfo.loginPassword }}</div>
-      <el-button type="text" @click="handleChange('登录密码')">修改</el-button>
+      <el-button type="text" @click="handleResetPassword">修改</el-button>
     </div>
     <div class="security-item">
       <div class="label">密保问题</div>

@@ -49,10 +49,10 @@ export const deleteUser = (id: number) => {
 };
 
 /** 重设用户密码 */
-export const resetUserPassword = (id: number, data: UserResetPasswordForm) => {
+export const resetUserPassword = (data: UserResetPasswordForm) => {
   return http.request<Result>(
     "post",
-    baseURLApiV1("/system/user/" + id + "/resetPassword"),
+    baseURLApiV1("/system/user/resetPassword"),
     { data }
   );
 };

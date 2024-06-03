@@ -172,6 +172,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   });
   // 重置的新密码
   const pwdForm = reactive<UserResetPasswordForm>({
+    id: 0,
     password: ""
   });
   const pwdProgress = [
@@ -494,12 +495,16 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
           </div>
         </>
       ),
-      closeCallBack: () => (pwdForm.password = ""),
+      closeCallBack: () => {
+        pwdForm.password = "";
+        pwdForm.id = 0;
+      },
       beforeSure: done => {
         ruleFormRef.value.validate(valid => {
           if (valid) {
             // 表单规则校验通过
-            resetUserPassword(row.id, pwdForm).then(() => {
+            pwdForm.id = row.id;
+            resetUserPassword(pwdForm).then(() => {
               message(`已成功重置 ${row.username} 用户的密码`, {
                 type: "success"
               });

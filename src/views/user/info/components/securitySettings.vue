@@ -13,7 +13,7 @@ const securityInfo = ref({
 });
 
 const handleChange = (type: string) => {
-  ElMessage.success(`${type}修改功能`);
+  ElMessage.error(`${type}功能未上线`);
 };
 
 const { handleResetPassword } = useUserInfo();
@@ -28,27 +28,27 @@ const { handleResetPassword } = useUserInfo();
         >修改</el-button
       >
     </div>
-    <div class="security-item">
-      <div class="label">密保问题</div>
-      <div class="info">{{ securityInfo.securityQuestion }}</div>
-      <el-button link type="primary" @click="handleChange('密保问题')"
-        >设置</el-button
-      >
-    </div>
-    <div class="security-item">
-      <div class="label">安全手机</div>
-      <div class="info">{{ securityInfo.securityMobile }}</div>
-      <el-button link type="primary" @click="handleChange('安全手机')"
-        >修改</el-button
-      >
-    </div>
-    <div class="security-item">
-      <div class="label">安全邮箱</div>
-      <div class="info">{{ securityInfo.securityEmail }}</div>
-      <el-button link type="primary" @click="handleChange('安全邮箱')"
-        >修改</el-button
-      >
-    </div>
+    <!--    <div class="security-item">-->
+    <!--      <div class="label">密保问题</div>-->
+    <!--      <div class="info">{{ securityInfo.securityQuestion }}</div>-->
+    <!--      <el-button link type="primary" @click="handleChange('密保问题')"-->
+    <!--        >设置</el-button-->
+    <!--      >-->
+    <!--    </div>-->
+    <!--    <div class="security-item">-->
+    <!--      <div class="label">安全手机</div>-->
+    <!--      <div class="info">{{ securityInfo.securityMobile }}</div>-->
+    <!--      <el-button link type="primary" @click="handleChange('安全手机')"-->
+    <!--        >修改</el-button-->
+    <!--      >-->
+    <!--    </div>-->
+    <!--    <div class="security-item">-->
+    <!--      <div class="label">安全邮箱</div>-->
+    <!--      <div class="info">{{ securityInfo.securityEmail }}</div>-->
+    <!--      <el-button link type="primary" @click="handleChange('安全邮箱')"-->
+    <!--        >修改</el-button-->
+    <!--      >-->
+    <!--    </div>-->
   </div>
 </template>
 <style scoped>

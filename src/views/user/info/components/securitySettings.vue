@@ -24,22 +24,30 @@ const { handleResetPassword } = useUserInfo();
     <div class="security-item">
       <div class="label">登录密码</div>
       <div class="info">{{ securityInfo.loginPassword }}</div>
-      <el-button type="text" @click="handleResetPassword">修改</el-button>
+      <el-button link type="primary" @click="handleResetPassword"
+        >修改</el-button
+      >
     </div>
     <div class="security-item">
       <div class="label">密保问题</div>
       <div class="info">{{ securityInfo.securityQuestion }}</div>
-      <el-button type="text" @click="handleChange('密保问题')">设置</el-button>
+      <el-button link type="primary" @click="handleChange('密保问题')"
+        >设置</el-button
+      >
     </div>
     <div class="security-item">
       <div class="label">安全手机</div>
       <div class="info">{{ securityInfo.securityMobile }}</div>
-      <el-button type="text" @click="handleChange('安全手机')">修改</el-button>
+      <el-button link type="primary" @click="handleChange('安全手机')"
+        >修改</el-button
+      >
     </div>
     <div class="security-item">
       <div class="label">安全邮箱</div>
       <div class="info">{{ securityInfo.securityEmail }}</div>
-      <el-button type="text" @click="handleChange('安全邮箱')">修改</el-button>
+      <el-button link type="primary" @click="handleChange('安全邮箱')"
+        >修改</el-button
+      >
     </div>
   </div>
 </template>

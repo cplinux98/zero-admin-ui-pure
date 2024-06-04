@@ -16,9 +16,11 @@ import Delete from "@iconify-icons/ep/delete";
 import EditPen from "@iconify-icons/ep/edit-pen";
 import Refresh from "@iconify-icons/ep/refresh";
 import Menu from "@iconify-icons/ep/menu";
+import DataBase from "@iconify-icons/ri/database-line";
 import AddFill from "@iconify-icons/ri/add-circle-line";
 import Close from "@iconify-icons/ep/close";
 import Check from "@iconify-icons/ep/check";
+import More from "@iconify-icons/ep/more-filled";
 
 defineOptions({
   name: "SystemRole"
@@ -49,7 +51,7 @@ const treeHeight = ref();
 
 const {
   form,
-  isShow,
+  isShowAuth,
   curRow,
   loading,
   columns,
@@ -70,12 +72,13 @@ const {
   handleSave,
   handleDelete,
   filterMethod,
-  transformI18n,
   onQueryChanged,
   // handleDatabase,
   handleSizeChange,
   handleCurrentChange,
-  handleSelectionChange
+  handleSelectionChange,
+  handleApi,
+  handleClose
 } = useRole(treeRef);
 
 onMounted(() => {
@@ -106,14 +109,14 @@ onMounted(() => {
           class="!w-[180px]"
         />
       </el-form-item>
-      <el-form-item label="角色标识：" prop="code">
-        <el-input
-          v-model="form.code"
-          placeholder="请输入角色标识"
-          clearable
-          class="!w-[180px]"
-        />
-      </el-form-item>
+      <!--      <el-form-item label="角色标识：" prop="code">-->
+      <!--        <el-input-->
+      <!--          v-model="form.code"-->
+      <!--          placeholder="请输入角色标识"-->
+      <!--          clearable-->
+      <!--          class="!w-[180px]"-->
+      <!--        />-->
+      <!--      </el-form-item>-->
       <el-form-item label="状态：" prop="status">
         <el-select
           v-model="form.status"
@@ -121,8 +124,8 @@ onMounted(() => {
           clearable
           class="!w-[180px]"
         >
-          <el-option label="已启用" value="1" />
-          <el-option label="已停用" value="0" />
+          <el-option label="已启用" :value="true" />
+          <el-option label="已停用" :value="false" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -145,9 +148,9 @@ onMounted(() => {
       :class="['flex', deviceDetection() ? 'flex-wrap' : '']"
     >
       <PureTableBar
-        :class="[isShow && !deviceDetection() ? '!w-[60vw]' : 'w-full']"
+        :class="[isShowAuth && !deviceDetection() ? '!w-[60vw]' : 'w-full']"
         style="transition: width 220ms cubic-bezier(0.4, 0, 0.2, 1)"
-        title="角色管理（仅演示，操作后不生效）"
+        title="角色管理"
         :columns="columns"
         @refresh="onSearch"
       >
@@ -190,7 +193,7 @@ onMounted(() => {
                 type="primary"
                 :size="size"
                 :icon="useRenderIcon(EditPen)"
-                @click="openDialog('修改', row)"
+                @click="openDialog('修改', row.id)"
               >
                 修改
               </el-button>
@@ -210,60 +213,60 @@ onMounted(() => {
                   </el-button>
                 </template>
               </el-popconfirm>
-              <el-button
-                class="reset-margin"
-                link
-                type="primary"
-                :size="size"
-                :icon="useRenderIcon(Menu)"
-                @click="handleMenu(row)"
-              >
-                权限
-              </el-button>
-              <!-- <el-dropdown>
-              <el-button
-                class="ml-3 mt-[2px]"
-                link
-                type="primary"
-                :size="size"
-                :icon="useRenderIcon(More)"
-              />
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item>
-                    <el-button
-                      :class="buttonClass"
-                      link
-                      type="primary"
-                      :size="size"
-                      :icon="useRenderIcon(Menu)"
-                      @click="handleMenu"
-                    >
-                      菜单权限
-                    </el-button>
-                  </el-dropdown-item>
-                  <el-dropdown-item>
-                    <el-button
-                      :class="buttonClass"
-                      link
-                      type="primary"
-                      :size="size"
-                      :icon="useRenderIcon(Database)"
-                      @click="handleDatabase"
-                    >
-                      数据权限
-                    </el-button>
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown> -->
+              <!--              <el-button-->
+              <!--                class="reset-margin"-->
+              <!--                link-->
+              <!--                type="primary"-->
+              <!--                :size="size"-->
+              <!--                :icon="useRenderIcon(Menu)"-->
+              <!--                @click="handleMenu(row)"-->
+              <!--              >-->
+              <!--                权限-->
+              <!--              </el-button>-->
+              <el-dropdown>
+                <el-button
+                  class="ml-3 mt-[2px]"
+                  link
+                  type="primary"
+                  :size="size"
+                  :icon="useRenderIcon(More)"
+                >
+                  权限
+                </el-button>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item>
+                      <el-button
+                        link
+                        type="primary"
+                        :size="size"
+                        :icon="useRenderIcon(Menu)"
+                        @click="handleMenu(row)"
+                      >
+                        菜单权限
+                      </el-button>
+                    </el-dropdown-item>
+                    <el-dropdown-item>
+                      <el-button
+                        link
+                        type="primary"
+                        :size="size"
+                        :icon="useRenderIcon(DataBase)"
+                        @click="handleApi(row)"
+                      >
+                        接口权限
+                      </el-button>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
             </template>
           </pure-table>
         </template>
       </PureTableBar>
 
       <div
-        v-if="isShow"
+        v-if="isShowAuth"
         class="!min-w-[calc(100vw-60vw-268px)] mt-2 px-2 pb-2 bg-bg_color ml-2 overflow-auto"
       >
         <div class="flex justify-between w-full px-3 pt-5 pb-4">
@@ -277,13 +280,13 @@ onMounted(() => {
                 width="18px"
                 height="18px"
                 :icon="Close"
-                @click="handleMenu"
+                @click="handleClose"
               />
             </span>
             <span :class="[iconClass, 'ml-2']">
               <IconifyIconOffline
                 v-tippy="{
-                  content: '保存菜单权限'
+                  content: '保存权限'
                 }"
                 class="dark:text-white"
                 width="18px"
@@ -294,13 +297,13 @@ onMounted(() => {
             </span>
           </div>
           <p class="font-bold truncate">
-            菜单权限
+            权限修改
             {{ `${curRow?.name ? `（${curRow.name}）` : ""}` }}
           </p>
         </div>
         <el-input
           v-model="treeSearchValue"
-          placeholder="请输入菜单进行搜索"
+          placeholder="请输入名称进行搜索"
           class="mb-1"
           clearable
           @input="onQueryChanged"
@@ -320,7 +323,7 @@ onMounted(() => {
           :filter-method="filterMethod"
         >
           <template #default="{ node }">
-            <span>{{ transformI18n(node.label) }}</span>
+            <span>{{ node.label }}</span>
           </template>
         </el-tree-v2>
       </div>

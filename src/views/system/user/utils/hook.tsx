@@ -240,10 +240,14 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   }
 
   function handleSizeChange(val: number) {
+    form.pageSize = val;
+    onSearch();
     console.log(`${val} items per page`);
   }
 
   function handleCurrentChange(val: number) {
+    form.page = val;
+    onSearch();
     console.log(`current page: ${val}`);
   }
 

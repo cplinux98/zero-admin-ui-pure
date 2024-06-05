@@ -167,10 +167,14 @@ export function useRole(treeRef: Ref) {
   }
 
   function handleSizeChange(val: number) {
-    console.log(`${val} items per page`);
+    form.pageSize = val;
+    onSearch();
+    // console.log(`${val} items per page`);
   }
 
   function handleCurrentChange(val: number) {
+    form.page = val;
+    onSearch();
     console.log(`current page: ${val}`);
   }
 

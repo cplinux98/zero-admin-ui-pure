@@ -2,17 +2,14 @@
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { ref, computed, watch, getCurrentInstance } from "vue";
 
-import Dept from "@iconify-icons/ri/git-branch-line";
-// import Reset from "@iconify-icons/ri/restart-line";
+import Menu from "@iconify-icons/ep/menu";
 import More2Fill from "@iconify-icons/ri/more-2-fill";
-import OfficeBuilding from "@iconify-icons/ep/office-building";
-import LocationCompany from "@iconify-icons/ep/add-location";
 import ExpandIcon from "./svg/expand.svg?component";
 import UnExpandIcon from "./svg/unexpand.svg?component";
 
 interface Tree {
   id: number;
-  name: string;
+  label: string;
   highlight?: boolean;
   children?: Tree[];
 }
@@ -31,7 +28,7 @@ const highlightMap = ref({});
 const { proxy } = getCurrentInstance();
 const defaultProps = {
   children: "children",
-  label: "name"
+  label: "label"
 };
 const buttonClass = computed(() => {
   return [
@@ -46,29 +43,31 @@ const buttonClass = computed(() => {
 
 const filterNode = (value: string, data: Tree) => {
   if (!value) return true;
-  return data.name.includes(value);
+  return data.label.includes(value);
 };
 
 function nodeClick(value) {
   const nodeId = value.$treeNodeId;
+  const nodeKey = value.value;
+
   highlightMap.value[nodeId] = highlightMap.value[nodeId]?.highlight
-    ? Object.assign({ id: nodeId }, highlightMap.value[nodeId], {
+    ? Object.assign({ id: nodeKey }, highlightMap.value[nodeId], {
         highlight: false
       })
-    : Object.assign({ id: nodeId }, highlightMap.value[nodeId], {
+    : Object.assign({ id: nodeKey }, highlightMap.value[nodeId], {
         highlight: true
       });
   Object.values(highlightMap.value).forEach((v: Tree) => {
-    if (v.id !== nodeId) {
+    if (v.id !== nodeKey) {
       v.highlight = false;
     }
   });
-  console.log(nodeId, highlightMap.value);
+  console.log(value.value);
   emit(
     "tree-select",
     highlightMap.value[nodeId]?.highlight
-      ? Object.assign({ ...value, selected: true })
-      : Object.assign({ ...value, selected: false })
+      ? Object.assign({ id: value.value, selected: true })
+      : Object.assign({ id: value.value, selected: false })
   );
 }
 
@@ -80,7 +79,7 @@ function toggleRowExpansionAll(status) {
   }
 }
 
-/** 重置部门树状态（选中状态、搜索框值、树初始化） */
+/** 重置分组树状态（选中状态、搜索框值、树初始化） */
 function onTreeReset() {
   highlightMap.value = {};
   searchValue.value = "";
@@ -105,7 +104,7 @@ defineExpose({ onTreeReset });
         v-model="searchValue"
         class="ml-2"
         size="small"
-        placeholder="请输入部门名称"
+        placeholder="请输入分组名称"
         clearable
       >
         <template #suffix>
@@ -155,7 +154,7 @@ defineExpose({ onTreeReset });
     <el-tree
       ref="treeRef"
       :data="props.treeData"
-      node-key="id"
+      node-key="value"
       size="small"
       :props="defaultProps"
       default-expand-all
@@ -187,16 +186,10 @@ defineExpose({ onTreeReset });
               : 'transparent'
           }"
         >
-          <IconifyIconOffline
-            :icon="
-              data.type === 1
-                ? OfficeBuilding
-                : data.type === 2
-                  ? LocationCompany
-                  : Dept
-            "
-          />
+          <IconifyIconOffline :icon="Menu" />
           {{ node.label }}
+          {{ node.id }}
+          {{ data.value }}
         </span>
       </template>
     </el-tree>

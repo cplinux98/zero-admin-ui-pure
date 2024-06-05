@@ -40,3 +40,13 @@ export const baseURLApiV1 = (url: string) => {
 export const baseURLApiV2 = (url: string) => {
   return `/api/v2${url}`;
 };
+
+/** 分页查询参数 **/
+export interface OptionType {
+  /** 值 **/
+  value: string | number;
+  /** 文本 **/
+  label: string;
+  /** 子列表 **/
+  children?: OptionType[];
+}

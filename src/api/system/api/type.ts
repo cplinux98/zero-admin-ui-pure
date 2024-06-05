@@ -1,5 +1,6 @@
 import type { Result } from "@/api/utils";
 import type { ResultTable, PageQuery } from "@/api/utils";
+import type { OptionType } from "@/api/utils";
 
 /**
  * 接口查询参数
@@ -94,3 +95,8 @@ export interface ApiTreeData {
  * 接口树形数据返回结果类型
  */
 export type ApiTreeDataResult = Result<ApiTreeData>;
+
+/**
+ * 接口树形数据返回结果类型
+ */
+export type ApiTreeGroupResult = Result<OptionType[]>;

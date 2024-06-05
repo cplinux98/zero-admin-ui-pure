@@ -10,6 +10,7 @@ import type {
   ApiDetailResult,
   ApiTreeDataResult
 } from "@/api/system/api/type";
+import type { ApiTreeGroupResult } from "@/api/system/api/type";
 
 /** 列表 */
 export const getApiList = (params?: ApiQuery) => {
@@ -48,5 +49,13 @@ export const getApiTreeData = () => {
   return http.request<ApiTreeDataResult>(
     "get",
     baseURLApiV1("/system/api/treeData")
+  );
+};
+
+/** 获取树形分组列表 */
+export const getApiTreeGroup = () => {
+  return http.request<ApiTreeGroupResult>(
+    "get",
+    baseURLApiV1("/system/api/treeGroup")
   );
 };

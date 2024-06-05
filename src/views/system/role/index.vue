@@ -64,7 +64,7 @@ const {
   isExpandAll,
   isSelectAll,
   treeSearchValue,
-  // buttonClass,
+  buttonClass,
   onSearch,
   resetForm,
   openDialog,
@@ -237,6 +237,7 @@ onMounted(() => {
                   <el-dropdown-menu>
                     <el-dropdown-item>
                       <el-button
+                        :class="buttonClass"
                         link
                         type="primary"
                         :size="size"
@@ -248,6 +249,7 @@ onMounted(() => {
                     </el-dropdown-item>
                     <el-dropdown-item>
                       <el-button
+                        :class="buttonClass"
                         link
                         type="primary"
                         :size="size"

@@ -19,7 +19,16 @@ import {
   updateRoleApiAuthData,
   updateRoleViewAuthData
 } from "@/api/system/role";
-import { type Ref, reactive, ref, onMounted, h, toRaw, watch } from "vue";
+import {
+  type Ref,
+  reactive,
+  ref,
+  onMounted,
+  h,
+  toRaw,
+  watch,
+  computed
+} from "vue";
 import type {
   RoleApiAuthDataSubmitObject,
   RoleForm,
@@ -107,15 +116,15 @@ export function useRole(treeRef: Ref) {
       slot: "operation"
     }
   ];
-  // const buttonClass = computed(() => {
-  //   return [
-  //     "!h-[20px]",
-  //     "reset-margin",
-  //     "!text-gray-500",
-  //     "dark:!text-white",
-  //     "dark:hover:!text-primary"
-  //   ];
-  // });
+  const buttonClass = computed(() => {
+    return [
+      "!h-[20px]",
+      "reset-margin",
+      "!text-gray-500",
+      "dark:!text-white",
+      "dark:hover:!text-primary"
+    ];
+  });
 
   // function onChange({ row, index }) {
   //   ElMessageBox.confirm(
@@ -428,7 +437,7 @@ export function useRole(treeRef: Ref) {
     isExpandAll,
     isSelectAll,
     treeSearchValue,
-    // buttonClass,
+    buttonClass,
     onSearch,
     resetForm,
     openDialog,

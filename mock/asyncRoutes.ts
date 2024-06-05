@@ -548,7 +548,7 @@ const fakeRouteData = [
 
 export default defineFakeRoute([
   {
-    url: "/api/v2/system/route",
+    url: "/api/v1/system/route",
     method: "get",
     response: () => {
       return {

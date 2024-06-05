@@ -242,13 +242,13 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   function handleSizeChange(val: number) {
     form.pageSize = val;
     onSearch();
-    console.log(`${val} items per page`);
+    // console.log(`${val} items per page`);
   }
 
   function handleCurrentChange(val: number) {
     form.page = val;
     onSearch();
-    console.log(`current page: ${val}`);
+    // console.log(`current page: ${val}`);
   }
 
   /** 当CheckBox选择项发生变化时会触发该事件 */

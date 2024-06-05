@@ -282,7 +282,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     const { data } = await getUserList(form);
     dataList.value = data.list;
     pagination.total = data.total;
-    pagination.pageSize = data.list.length;
+    // pagination.pageSize = data.list.length;
     // pagination.currentPage = data.currentPage;
 
     setTimeout(() => {

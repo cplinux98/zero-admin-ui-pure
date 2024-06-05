@@ -184,7 +184,7 @@ export function useRole(treeRef: Ref) {
   function handleCurrentChange(val: number) {
     form.page = val;
     onSearch();
-    console.log(`current page: ${val}`);
+    // console.log(`current page: ${val}`);
   }
 
   function handleSelectionChange(val) {
@@ -213,7 +213,10 @@ export function useRole(treeRef: Ref) {
     const { data } = await getRoleList(toRaw(form));
     dataList.value = data.list;
     pagination.total = data.total;
-    pagination.pageSize = data.list.length;
+    // if (dataList.value.length > 0) {
+    //   pagination.pageSize = data.list.length;
+    // }
+
     // pagination.pageSize = data.pageSize;
     // pagination.currentPage = data.currentPage;
 
@@ -403,7 +406,7 @@ export function useRole(treeRef: Ref) {
     const menuResponse = await getMenuList();
     viewAuthDataTreeIds.value = getKeyList(menuResponse.data, "id");
     viewAuthDataTreeData.value = handleTree(menuResponse.data);
-    console.log(viewAuthDataTreeData.value);
+    // console.log(viewAuthDataTreeData.value);
     // 获取API树形数据
     const apiResponse = await getApiTreeData();
     apiAuthDataTreeIds.value = apiResponse.data.allIds;

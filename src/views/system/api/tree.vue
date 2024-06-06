@@ -162,7 +162,7 @@ defineExpose({ onTreeReset });
       :filter-node-method="filterNode"
       @node-click="nodeClick"
     >
-      <template #default="{ node, data }">
+      <template #default="{ node }">
         <span
           :class="[
             'pl-1',
@@ -188,8 +188,6 @@ defineExpose({ onTreeReset });
         >
           <IconifyIconOffline :icon="Menu" />
           {{ node.label }}
-          {{ node.id }}
-          {{ data.value }}
         </span>
       </template>
     </el-tree>

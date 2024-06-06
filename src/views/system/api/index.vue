@@ -59,24 +59,21 @@ const {
         :model="form"
         class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px] overflow-auto"
       >
-        <el-form-item label="关键词：" prop="keyword">
+        <el-form-item label="接口名称：" prop="name">
           <el-input
-            v-model="form.keyword"
-            placeholder="请输入接口名/手机号/接口昵称"
+            v-model="form.name"
+            placeholder="请输入接口名称关键词"
             clearable
             class="!w-[220px]"
           />
         </el-form-item>
-        <el-form-item label="状态：" prop="status">
-          <el-select
-            v-model="form.status"
-            placeholder="请选择"
+        <el-form-item label="接口路径：" prop="path">
+          <el-input
+            v-model="form.path"
+            placeholder="请输入接口路径关键词"
             clearable
-            class="!w-[180px]"
-          >
-            <el-option label="已开启" :value="true" />
-            <el-option label="已关闭" :value="false" />
-          </el-select>
+            class="!w-[220px]"
+          />
         </el-form-item>
         <el-form-item>
           <el-button

@@ -4,7 +4,6 @@ import editForm from "../form.vue";
 import { message } from "@/utils/message";
 import { addDialog } from "@/components/ReDialog";
 import type { PaginationProps } from "@pureadmin/table";
-import type { FormItemProps } from "../utils/types";
 import { getKeyList, deviceDetection } from "@pureadmin/utils";
 
 import {
@@ -19,16 +18,19 @@ import {
 import { type Ref, h, ref, computed, reactive, onMounted } from "vue";
 import type { ApiForm, ApiQuery } from "@/api/system/api/type";
 import { pageConfigDefault } from "@/utils/pageConfigDefault";
+import { usePublicHooks } from "@/views/system/hooks";
+import { ApiSupportMethod } from "@/views/system/api/utils/enums";
 export const FormTitle = ref("新增");
+const { tagStyle } = usePublicHooks();
 
 export function useApi(tableRef: Ref, treeRef: Ref) {
   const form = reactive<ApiQuery>({
     page: 1,
     pageSize: pageConfigDefault.pageSize,
     // 左侧部门树的id
-    deptId: undefined,
-    keyword: undefined,
-    status: undefined
+    group: undefined,
+    name: undefined,
+    path: undefined
   });
   const formRef = ref();
 
@@ -36,7 +38,7 @@ export function useApi(tableRef: Ref, treeRef: Ref) {
   const loading = ref(true);
   // 上传头像信息
 
-  const higherDeptOptions = ref();
+  const higherGroupOptions = ref();
   const treeData = ref([]);
   const treeLoading = ref(true);
   const selectedNum = ref(0);
@@ -71,25 +73,37 @@ export function useApi(tableRef: Ref, treeRef: Ref) {
     {
       label: "方法",
       prop: "method",
-      minWidth: 90
+      minWidth: 90,
+      cellRenderer: ({ row, props }) => (
+        <el-tag size={props.size}>{ApiSupportMethod[row.method]}</el-tag>
+      )
     },
     {
       label: "所属分组",
       prop: "group",
       minWidth: 90
     },
-
+    {
+      label: "是否必须",
+      prop: "isRequired",
+      minWidth: 90,
+      cellRenderer: ({ row, props }) => (
+        <el-tag size={props.size} style={tagStyle.value(row.isRequired)}>
+          {row.isRequired ? "是" : "否"}
+        </el-tag>
+      )
+    },
+    {
+      label: "描述信息",
+      prop: "description",
+      minWidth: 200
+    },
     {
       label: "创建时间",
       width: 180,
       prop: "createTime",
       formatter: ({ createTime }) =>
         dayjs.unix(createTime).format("YYYY-MM-DD HH:mm:ss")
-    },
-    {
-      label: "描述信息",
-      prop: "description",
-      minWidth: 200
     },
     {
       label: "操作",
@@ -173,46 +187,32 @@ export function useApi(tableRef: Ref, treeRef: Ref) {
   const resetForm = formEl => {
     if (!formEl) return;
     formEl.resetFields();
-    form.deptId = undefined;
+    form.group = undefined;
     treeRef.value.onTreeReset();
     onSearch();
   };
 
   function onTreeSelect({ id, selected }) {
     // console.log(id, selected);
-    form.deptId = selected ? id : "";
+    form.group = selected ? id : "";
     onSearch();
   }
 
-  function formatHigherDeptOptions(treeList) {
-    // 根据返回数据的status字段值判断追加是否禁用disabled字段，返回处理后的树结构，用于上级部门级联选择器的展示（实际开发中也是如此，不可能前端需要的每个字段后端都会返回，这时需要前端自行根据后端返回的某些字段做逻辑处理）
-    if (!treeList || !treeList.length) return;
-    const newTreeList = [];
-    for (let i = 0; i < treeList.length; i++) {
-      treeList[i].disabled = treeList[i].status === false;
-      formatHigherDeptOptions(treeList[i].children);
-      newTreeList.push(treeList[i]);
-    }
-    // console.log(newTreeList);
-    return newTreeList;
-  }
-
   // 获取所属部门选项
-  function getHigherDeptOptions() {
-    return formatHigherDeptOptions(higherDeptOptions.value);
+  function getHigherGroupOptions() {
+    return higherGroupOptions.value;
+    // return formatHigherGroupOptions(higherGroupOptions.value);
   }
 
   async function openDialog(id?: number) {
     let row = ref<ApiForm>({
-      id: undefined,
-      apiname: "",
-      password: "",
-      nickname: "",
-      status: true,
       description: "",
-      mobile: "",
-      email: "",
-      deptId: 0
+      group: 0,
+      id: undefined,
+      isRequired: false,
+      method: 0,
+      name: "",
+      path: ""
     });
     if (id) {
       try {
@@ -224,10 +224,6 @@ export function useApi(tableRef: Ref, treeRef: Ref) {
       FormTitle.value = "修改";
     } else {
       FormTitle.value = "新增";
-    }
-
-    if (form.deptId) {
-      row.value.deptId = form.deptId;
     }
 
     addDialog({
@@ -243,10 +239,10 @@ export function useApi(tableRef: Ref, treeRef: Ref) {
       contentRenderer: () => h(editForm, { ref: formRef }),
       beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
-        const curData = options.props.formInline as FormItemProps;
+        const curData = options.props.formInline as ApiForm;
 
         function chores() {
-          message(`您${FormTitle.value}了接口名称为${curData}的这条数据`, {
+          message(`您${FormTitle.value}了接口名称为${curData.name}的这条数据`, {
             type: "success"
           });
           done(); // 关闭弹框
@@ -280,14 +276,9 @@ export function useApi(tableRef: Ref, treeRef: Ref) {
 
     // 获取分组数据
     const { data } = await getApiTreeGroup();
-    // higherDeptOptions.value = handleTreeWithSort(data);
+    higherGroupOptions.value = data;
     treeData.value = data;
-    // treeData.value = handleTreeWithSort(data);
-    // // console.log(treeData.value);
     treeLoading.value = false;
-
-    // 角色列表
-    // roleOptions.value = (await getAllRoleList()).data;
   });
 
   return {
@@ -312,6 +303,6 @@ export function useApi(tableRef: Ref, treeRef: Ref) {
     onSelectionCancel,
     handleCurrentChange,
     handleSelectionChange,
-    getHigherDeptOptions
+    getHigherGroupOptions
   };
 }

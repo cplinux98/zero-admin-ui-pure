@@ -18,11 +18,6 @@ const newFormInline = ref(props.formInline);
 <template>
   <el-form :model="newFormInline">
     <el-row :gutter="30">
-      <!-- <re-col>
-        <el-form-item label="用户名称" prop="username">
-          <el-input disabled v-model="newFormInline.username" />
-        </el-form-item>
-      </re-col> -->
       <re-col>
         <el-form-item label="用户昵称" prop="nickname">
           <el-input v-model="newFormInline.nickname" disabled />
@@ -35,15 +30,16 @@ const newFormInline = ref(props.formInline);
             placeholder="请选择"
             class="w-full"
             clearable
+            filterable
             multiple
           >
             <el-option
               v-for="(item, index) in newFormInline.roleOptions"
               :key="index"
-              :value="item.id"
-              :label="item.name"
+              :value="item.value"
+              :label="item.label"
             >
-              {{ item.name }}
+              {{ item.label }}
             </el-option>
           </el-select>
         </el-form-item>

@@ -1,5 +1,6 @@
 import type { Result } from "@/api/utils";
 import type { ResultTable, PageQuery } from "@/api/utils";
+import type { OptionsType } from "@/components/ReSegmented";
 
 /**
  * 角色查询参数
@@ -85,3 +86,8 @@ export interface RoleViewAuthDataSubmitObject {
 export interface RoleApiAuthDataSubmitObject {
   apiIds: number[];
 }
+
+/**
+ * 获取角色选项数据响应结果
+ */
+export type GetRoleOptionResult = Result<OptionsType[]>;

@@ -13,6 +13,7 @@ import type {
   RoleApiAuthData,
   RoleApiAuthDataSubmitObject
 } from "@/api/system/role/type";
+import type { GetRoleOptionResult } from "@/api/system/role/type";
 
 /** 列表 */
 export const getRoleList = (params?: RoleQuery) => {
@@ -85,5 +86,13 @@ export const updateRoleApiAuthData = (
     {
       data
     }
+  );
+};
+
+/** 获取角色选项数据 */
+export const getSysRoleOption = () => {
+  return http.request<GetRoleOptionResult>(
+    "get",
+    baseURLApiV1("/system/role/option")
   );
 };

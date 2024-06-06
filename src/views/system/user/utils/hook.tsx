@@ -17,33 +17,31 @@ import {
   hideTextAtIndex,
   deviceDetection
 } from "@pureadmin/utils";
-import { getRoleIds } from "@/api/system";
 import {
   createUser,
   deleteUser,
   getUser,
+  getUserBindingRoleIds,
   getUserList,
   resetUserPassword,
   updateUser,
+  updateUserBindingRoleIds,
   uploadUserAvatar
 } from "@/api/system/user";
 import { getDeptList } from "@/api/system/dept";
-import {
-  ElForm,
-  ElInput,
-  ElFormItem,
-  ElProgress,
-  ElMessageBox
-} from "element-plus";
+import { ElForm, ElInput, ElFormItem, ElProgress } from "element-plus";
 import { type Ref, h, ref, watch, computed, reactive, onMounted } from "vue";
 import type {
+  UpdateUserBindingRoleIdsRequest,
   UploadAvatarForm,
   UserForm,
   UserQuery,
   UserResetPasswordForm
 } from "@/api/system/user/type";
 import { pageConfigDefault } from "@/utils/pageConfigDefault";
+import { getSysRoleOption } from "@/api/system/role";
 
+const { tagStyle } = usePublicHooks();
 export const FormTitle = ref("新增");
 
 export function useUser(tableRef: Ref, treeRef: Ref) {
@@ -61,8 +59,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   const loading = ref(true);
   // 上传头像信息
   const avatarInfo = ref();
-  const switchLoadMap = ref({});
-  const { switchStyle } = usePublicHooks();
   const higherDeptOptions = ref();
   const treeData = ref([]);
   const treeLoading = ref(true);
@@ -124,22 +120,10 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       label: "状态",
       prop: "status",
       minWidth: 90,
-      cellRenderer: scope => (
-        <el-switch
-          size={scope.props.size === "small" ? "small" : "default"}
-          loading={switchLoadMap.value[scope.index]?.loading}
-          v-model={scope.row.status}
-          inactibe-value={false}
-          active-value={true}
-          active-text="已启用"
-          inactive-text="已停用"
-          inline-prompt
-          style={switchStyle.value}
-          // 如果后端返回的status类型与当前对象的status类型不一致，会导致onChange在table加载data时触发
-          onChange={() => onChange(scope as any)}
-          // 系统内置超级管理员禁止任何修改
-          disabled={scope.row.id === 1}
-        />
+      cellRenderer: ({ row, props }) => (
+        <el-tag size={props.size} style={tagStyle.value(row.status)}>
+          {row.status ? "启用" : "停用"}
+        </el-tag>
       )
     },
     {
@@ -186,47 +170,47 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   const curScore = ref();
   const roleOptions = ref([]);
 
-  function onChange({ row, index }) {
-    ElMessageBox.confirm(
-      `确认要<strong>${
-        row.status ? "启用" : "停用"
-      }</strong><strong style='color:var(--el-color-primary)'>${
-        row.username
-      }</strong>用户吗?`,
-      "系统提示",
-      {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-        dangerouslyUseHTMLString: true,
-        draggable: true
-      }
-    )
-      .then(() => {
-        switchLoadMap.value[index] = Object.assign(
-          {},
-          switchLoadMap.value[index],
-          {
-            loading: true
-          }
-        );
-        setTimeout(() => {
-          switchLoadMap.value[index] = Object.assign(
-            {},
-            switchLoadMap.value[index],
-            {
-              loading: false
-            }
-          );
-          message("已成功修改用户状态", {
-            type: "success"
-          });
-        }, 300);
-      })
-      .catch(() => {
-        row.status === 0 ? (row.status = 1) : (row.status = 0);
-      });
-  }
+  // function onChange({ row, index }) {
+  //   ElMessageBox.confirm(
+  //     `确认要<strong>${
+  //       row.status ? "启用" : "停用"
+  //     }</strong><strong style='color:var(--el-color-primary)'>${
+  //       row.username
+  //     }</strong>用户吗?`,
+  //     "系统提示",
+  //     {
+  //       confirmButtonText: "确定",
+  //       cancelButtonText: "取消",
+  //       type: "warning",
+  //       dangerouslyUseHTMLString: true,
+  //       draggable: true
+  //     }
+  //   )
+  //     .then(() => {
+  //       switchLoadMap.value[index] = Object.assign(
+  //         {},
+  //         switchLoadMap.value[index],
+  //         {
+  //           loading: true
+  //         }
+  //       );
+  //       setTimeout(() => {
+  //         switchLoadMap.value[index] = Object.assign(
+  //           {},
+  //           switchLoadMap.value[index],
+  //           {
+  //             loading: false
+  //           }
+  //         );
+  //         message("已成功修改用户状态", {
+  //           type: "success"
+  //         });
+  //       }, 300);
+  //     })
+  //     .catch(() => {
+  //       row.status === 0 ? (row.status = 1) : (row.status = 0);
+  //     });
+  // }
 
   function handleUpdate(row) {
     console.log(row);
@@ -526,7 +510,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   /** 分配角色 */
   async function handleRole(row) {
     // 选中的角色列表
-    const ids = (await getRoleIds({ userId: row.id })).data ?? [];
+    const ids = (await getUserBindingRoleIds(row.id)).data ?? [];
     addDialog({
       title: `分配 ${row.username} 用户的角色`,
       props: {
@@ -545,9 +529,26 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       contentRenderer: () => h(roleForm),
       beforeSure: (done, { options }) => {
         const curData = options.props.formInline as RoleFormItemProps;
-        console.log("curIds", curData.ids);
+        // console.log("curIds", curData.ids);
         // 根据实际业务使用curData.ids和row里的某些字段去调用修改角色接口即可
-        done(); // 关闭弹框
+        const req: UpdateUserBindingRoleIdsRequest = {
+          roleIds: []
+        };
+        curData.ids.forEach(record => {
+          // 类型检查和转换
+          if (typeof record === "number") {
+            req.roleIds.push(record);
+          } else {
+            console.warn(`Record is not a number: ${record}`);
+          }
+        });
+        // console.log("curIds", curData.ids);
+        updateUserBindingRoleIds(row.id, req).then(() => {
+          message(`已成功更新 ${row.username} 用户的角色信息`, {
+            type: "success"
+          });
+          done(); // 关闭弹框
+        });
       }
     });
   }
@@ -564,6 +565,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     treeLoading.value = false;
 
     // 角色列表
+    roleOptions.value = (await getSysRoleOption()).data;
     // roleOptions.value = (await getAllRoleList()).data;
   });
 

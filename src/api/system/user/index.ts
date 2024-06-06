@@ -8,7 +8,9 @@ import type {
   UserQuery,
   UserListResult,
   UserDetailResult,
-  UserResetPasswordForm
+  UserResetPasswordForm,
+  GetUserBindingRoleIdsResult,
+  UpdateUserBindingRoleIdsRequest
 } from "@/api/system/user/type";
 import type {
   SelfUserInfoForm,
@@ -85,4 +87,24 @@ export const updateSelfUserInfo = (data: SelfUserInfoForm) => {
   return http.request<Result>("patch", baseURLApiV1("/system/user/self"), {
     data
   });
+};
+
+/** 获取用户绑定的角色id集合 */
+export const getUserBindingRoleIds = (id: number) => {
+  return http.request<GetUserBindingRoleIdsResult>(
+    "get",
+    baseURLApiV1("/system/user/" + id + "/bindingRole")
+  );
+};
+
+/** 更新用户绑定的角色id集合 */
+export const updateUserBindingRoleIds = (
+  id: number,
+  data: UpdateUserBindingRoleIdsRequest
+) => {
+  return http.request<GetUserBindingRoleIdsResult>(
+    "put",
+    baseURLApiV1("/system/user/" + id + "/bindingRole"),
+    { data }
+  );
 };

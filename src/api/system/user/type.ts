@@ -147,3 +147,15 @@ export interface UploadAvatarForm {
   /** 图片文件 */
   file: File;
 }
+
+/**
+ * 查询用户id绑定角色id集合响应数据
+ */
+export type GetUserBindingRoleIdsResult = Result<number[]>;
+
+/**
+ * 更新用户id绑定角色id集合请求数据
+ */
+export interface UpdateUserBindingRoleIdsRequest {
+  roleIds: number[];
+}

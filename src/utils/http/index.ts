@@ -83,8 +83,8 @@ class PureHttp {
         const whiteList = [
           "/api/v1/system/login/refreshToken",
           "/api/v1/system/login",
-          "/api/v1/system/login/captcha",
-          "/api/v1/system/login/logout"
+          "/api/v1/system/login/captcha"
+          // "/api/v1/system/login/logout"
         ];
         return whiteList.some(url => config.url.endsWith(url))
           ? config

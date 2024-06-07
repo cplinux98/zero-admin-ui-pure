@@ -5,6 +5,7 @@ import type {
   LoginResult
 } from "@/api/login/type";
 import { baseURLApiV1 } from "@/api/utils";
+// import type { LogoutRequest } from "@/api/login/type";
 /** 登录 */
 export const login = (data?: LoginRequest) => {
   return http.request<LoginResult>("post", baseURLApiV1("/system/login"), {
@@ -21,7 +22,7 @@ export const getLoginCaptcha = () => {
 };
 
 /** 刷新`token` */
-export const refreshToken = (data?: object) => {
+export const refreshToken = (data: object) => {
   return http.request<LoginResult>(
     "post",
     baseURLApiV1("/system/login/refreshToken"),
@@ -32,9 +33,9 @@ export const refreshToken = (data?: object) => {
 };
 
 /** 注销 */
-export function logout() {
+export const logout = () => {
   return http.request<LoginResult>(
     "delete",
     baseURLApiV1("/system/login/logout")
   );
-}
+};

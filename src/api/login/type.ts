@@ -53,3 +53,10 @@ export interface RefreshTokenRequest {
   /** 用于调用刷新`accessToken`的接口时所需的`token` */
   refreshToken: string;
 }
+
+// /**
+//  * 注销登录请求参数
+//  */
+// export interface LogoutRequest {
+//   refreshToken: string;
+// }

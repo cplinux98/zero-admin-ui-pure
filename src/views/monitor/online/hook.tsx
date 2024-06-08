@@ -1,12 +1,19 @@
 import dayjs from "dayjs";
 import { message } from "@/utils/message";
-import { getOnlineLogsList } from "@/api/system";
-import { reactive, ref, onMounted, toRaw } from "vue";
+import { reactive, ref, onMounted } from "vue";
 import type { PaginationProps } from "@pureadmin/table";
+import {
+  forceLogoutOnlineUser,
+  getOnlineUserList
+} from "@/api/monitor/loginLog";
+import type { OnlineUserQuery } from "@/api/monitor/loginLog/type";
+import { pageConfigDefault } from "@/utils/pageConfigDefault";
 
 export function useRole() {
-  const form = reactive({
-    username: ""
+  const form = reactive<OnlineUserQuery>({
+    page: 1,
+    pageSize: pageConfigDefault.pageSize,
+    username: undefined
   });
   const dataList = ref([]);
   const loading = ref(true);
@@ -18,9 +25,9 @@ export function useRole() {
   });
   const columns: TableColumnList = [
     {
-      label: "序号",
-      prop: "id",
-      minWidth: 60
+      label: "会话id",
+      prop: "sessionUUID",
+      minWidth: 200
     },
     {
       label: "用户名",
@@ -34,13 +41,13 @@ export function useRole() {
     },
     {
       label: "登录地点",
-      prop: "address",
+      prop: "location",
       minWidth: 140
     },
     {
       label: "操作系统",
       prop: "system",
-      minWidth: 100
+      minWidth: 150
     },
     {
       label: "浏览器类型",
@@ -52,7 +59,7 @@ export function useRole() {
       prop: "loginTime",
       minWidth: 180,
       formatter: ({ loginTime }) =>
-        dayjs(loginTime).format("YYYY-MM-DD HH:mm:ss")
+        dayjs.unix(loginTime).format("YYYY-MM-DD HH:mm:ss")
     },
     {
       label: "操作",
@@ -62,11 +69,15 @@ export function useRole() {
   ];
 
   function handleSizeChange(val: number) {
-    console.log(`${val} items per page`);
+    form.pageSize = val;
+    onSearch();
+    // console.log(`${val} items per page`);
   }
 
   function handleCurrentChange(val: number) {
-    console.log(`current page: ${val}`);
+    form.page = val;
+    onSearch();
+    // console.log(`current page: ${val}`);
   }
 
   function handleSelectionChange(val) {
@@ -74,17 +85,19 @@ export function useRole() {
   }
 
   function handleOffline(row) {
-    message(`${row.username}已被强制下线`, { type: "success" });
-    onSearch();
+    if (row.sessionUUID) {
+      forceLogoutOnlineUser({ sessionUUID: row.sessionUUID }).then(() => {
+        message(`会话${row.sessionUUID}已被强制下线`, { type: "success" });
+        onSearch();
+      });
+    }
   }
 
   async function onSearch() {
     loading.value = true;
-    const { data } = await getOnlineLogsList(toRaw(form));
+    const { data } = await getOnlineUserList(form);
     dataList.value = data.list;
     pagination.total = data.total;
-    pagination.pageSize = data.pageSize;
-    pagination.currentPage = data.currentPage;
 
     setTimeout(() => {
       loading.value = false;

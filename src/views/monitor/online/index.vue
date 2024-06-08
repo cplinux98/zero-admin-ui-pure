@@ -58,11 +58,7 @@ const {
       </el-form-item>
     </el-form>
 
-    <PureTableBar
-      title="在线用户（仅演示，操作后不生效）"
-      :columns="columns"
-      @refresh="onSearch"
-    >
+    <PureTableBar title="在线用户" :columns="columns" @refresh="onSearch">
       <template v-slot="{ size, dynamicColumns }">
         <pure-table
           align-whole="center"
@@ -86,7 +82,7 @@ const {
         >
           <template #operation="{ row }">
             <el-popconfirm
-              :title="`是否强制下线${row.username}`"
+              :title="`是否强制下线会话${row.sessionUUID}`"
               @confirm="handleOffline(row)"
             >
               <template #reference>

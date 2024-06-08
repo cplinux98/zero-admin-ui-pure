@@ -1,37 +1,54 @@
 import dayjs from "dayjs";
+import Detail from "./detail.vue";
 import { message } from "@/utils/message";
-import { getKeyList } from "@pureadmin/utils";
-import { getOperationLogsList } from "@/api/system";
-import { usePublicHooks } from "@/views/system/hooks";
+import { addDialog } from "@/components/ReDialog";
 import type { PaginationProps } from "@pureadmin/table";
-import { type Ref, reactive, ref, onMounted, toRaw } from "vue";
+import { type Ref, reactive, ref, onMounted } from "vue";
+import { getKeyList, useCopyToClipboard } from "@pureadmin/utils";
+import Info from "@iconify-icons/ri/question-line";
+import {
+  getOperationLogDetail,
+  getOperationLogList
+} from "@/api/monitor/operationLog";
+import type { OperationLogQuery } from "@/api/monitor/operationLog/type";
+import { pageConfigDefault } from "@/utils/pageConfigDefault";
+import { usePublicHooks } from "@/views/system/hooks";
 
 export function useRole(tableRef: Ref) {
-  const form = reactive({
-    module: "",
-    status: "",
-    operatingTime: ""
+  const form = reactive<OperationLogQuery>({
+    page: 1,
+    pageSize: pageConfigDefault.pageSize
   });
   const dataList = ref([]);
   const loading = ref(true);
   const selectedNum = ref(0);
+  const { copied, update } = useCopyToClipboard();
   const { tagStyle } = usePublicHooks();
-
   const pagination = reactive<PaginationProps>({
     total: 0,
     pageSize: 10,
     currentPage: 1,
     background: true
   });
+
+  // const getLevelType = (type, text = false) => {
+  //   switch (type) {
+  //     case 0:
+  //       return text ? "debug" : "primary";
+  //     case 1:
+  //       return text ? "info" : "success";
+  //     case 2:
+  //       return text ? "warn" : "info";
+  //     case 3:
+  //       return text ? "error" : "warning";
+  //     case 4:
+  //       return text ? "fatal" : "danger";
+  //   }
+  // };
+
   const columns: TableColumnList = [
     {
-      label: "勾选列", // 如果需要表格多选，此处label必须设置
-      type: "selection",
-      fixed: "left",
-      reserveSelection: true // 数据刷新后保留选项
-    },
-    {
-      label: "序号",
+      label: "ID",
       prop: "id",
       minWidth: 90
     },
@@ -43,21 +60,37 @@ export function useRole(tableRef: Ref) {
     {
       label: "所属模块",
       prop: "module",
+      minWidth: 100
+    },
+    {
+      headerRenderer: () => (
+        <span class="flex-c">
+          请求接口
+          <iconifyIconOffline
+            icon={Info}
+            class="ml-1 cursor-help"
+            v-tippy={{
+              content: "双击下面请求接口进行拷贝"
+            }}
+          />
+        </span>
+      ),
+      prop: "path",
       minWidth: 140
     },
     {
-      label: "操作概要",
-      prop: "summary",
+      label: "请求方法",
+      prop: "method",
       minWidth: 140
     },
     {
-      label: "操作 IP",
+      label: "IP 地址",
       prop: "ip",
       minWidth: 100
     },
     {
-      label: "操作地点",
-      prop: "address",
+      label: "地点",
+      prop: "location",
       minWidth: 140
     },
     {
@@ -71,21 +104,43 @@ export function useRole(tableRef: Ref) {
       minWidth: 100
     },
     {
-      label: "操作状态",
-      prop: "status",
+      label: "操作状态码",
+      prop: "httpStatus",
       minWidth: 100,
       cellRenderer: ({ row, props }) => (
-        <el-tag size={props.size} style={tagStyle.value(row.status)}>
-          {row.status === 1 ? "成功" : "失败"}
+        <el-tag
+          size={props.size}
+          style={tagStyle.value(row.httpStatus === 200)}
+        >
+          {row.httpStatus}
         </el-tag>
       )
     },
     {
-      label: "操作时间",
-      prop: "operatingTime",
+      label: "请求耗时",
+      prop: "useTime",
+      minWidth: 100,
+      cellRenderer: ({ row, props }) => (
+        <el-tag
+          size={props.size}
+          type={row.useTime < 1000 ? "success" : "warning"}
+          effect="plain"
+        >
+          {row.useTime} ms
+        </el-tag>
+      )
+    },
+    {
+      label: "请求时间",
+      prop: "requestTime",
       minWidth: 180,
-      formatter: ({ operatingTime }) =>
-        dayjs(operatingTime).format("YYYY-MM-DD HH:mm:ss")
+      formatter: ({ requestTime }) =>
+        dayjs.unix(requestTime).format("YYYY-MM-DD HH:mm:ss")
+    },
+    {
+      label: "操作",
+      fixed: "right",
+      slot: "operation"
     }
   ];
 
@@ -111,6 +166,15 @@ export function useRole(tableRef: Ref) {
     tableRef.value.getTableRef().clearSelection();
   }
 
+  /** 拷贝请求接口，表格单元格被双击时触发 */
+  function handleCellDblclick({ url }, { property }) {
+    if (property !== "url") return;
+    update(url);
+    copied.value
+      ? message(`${url} 已拷贝`, { type: "success" })
+      : message("拷贝失败", { type: "warning" });
+  }
+
   /** 批量删除 */
   function onbatchDel() {
     // 返回当前选中的行
@@ -132,13 +196,25 @@ export function useRole(tableRef: Ref) {
     onSearch();
   }
 
+  function onDetail(row) {
+    getOperationLogDetail(row.id).then(({ data }) => {
+      addDialog({
+        title: "系统日志详情",
+        fullscreen: true,
+        hideFooter: true,
+        contentRenderer: () => Detail,
+        props: {
+          data: [data]
+        }
+      });
+    });
+  }
+
   async function onSearch() {
     loading.value = true;
-    const { data } = await getOperationLogsList(toRaw(form));
+    const { data } = await getOperationLogList(form);
     dataList.value = data.list;
     pagination.total = data.total;
-    pagination.pageSize = data.pageSize;
-    pagination.currentPage = data.currentPage;
 
     setTimeout(() => {
       loading.value = false;
@@ -163,11 +239,13 @@ export function useRole(tableRef: Ref) {
     pagination,
     selectedNum,
     onSearch,
+    onDetail,
     clearAll,
     resetForm,
     onbatchDel,
     handleSizeChange,
     onSelectionCancel,
+    handleCellDblclick,
     handleCurrentChange,
     handleSelectionChange
   };

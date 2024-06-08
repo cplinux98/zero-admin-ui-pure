@@ -2,6 +2,8 @@
 import { ref } from "vue";
 import "vue-json-pretty/lib/styles.css";
 import VueJsonPretty from "vue-json-pretty";
+import PureDescriptions from "@pureadmin/descriptions";
+import dayjs from "dayjs";
 
 const props = defineProps({
   data: {
@@ -17,7 +19,7 @@ const columns = [
   },
   {
     label: "地点",
-    prop: "address"
+    prop: "location"
   },
   {
     label: "操作系统",
@@ -41,11 +43,11 @@ const columns = [
   },
   {
     label: "请求耗时",
-    prop: "takesTime"
+    prop: "useTime"
   },
   {
     label: "请求接口",
-    prop: "url",
+    prop: "path",
     copy: true
   },
   {
@@ -55,26 +57,33 @@ const columns = [
   }
 ];
 
+const parseJson = (jsonStr: string): object => {
+  try {
+    return JSON.parse(jsonStr);
+  } catch (e) {
+    return { error: e, raw: jsonStr };
+  }
+};
 const dataList = ref([
   {
     title: "响应头",
     name: "responseHeaders",
-    data: (props.data[0] as any).responseHeaders
+    data: parseJson((props.data[0] as any).responseHeaders)
   },
   {
     title: "响应体",
-    name: "responseBody",
-    data: (props.data[0] as any).responseBody
+    name: "httpResponse",
+    data: parseJson((props.data[0] as any).httpResponse)
   },
   {
     title: "请求头",
     name: "requestHeaders",
-    data: (props.data[0] as any).requestHeaders
+    data: parseJson((props.data[0] as any).requestHeaders)
   },
   {
     title: "请求体",
-    name: "requestBody",
-    data: (props.data[0] as any).requestBody
+    name: "body",
+    data: parseJson((props.data[0] as any).body)
   }
 ]);
 </script>
@@ -86,10 +95,15 @@ const dataList = ref([
         border
         :data="props.data"
         :columns="columns"
-        :column="5"
-      />
+        :column="3"
+      >
+        <template #requestTime="{ value }">
+          <el-tag size="small">{{ value }}</el-tag>
+          {{ dayjs.unix(value).format("YYYY-MM-DD HH:mm:ss") }}
+        </template>
+      </PureDescriptions>
     </el-scrollbar>
-    <el-tabs :modelValue="'responseBody'" type="border-card" class="mt-4">
+    <el-tabs :modelValue="'httpResponse'" type="border-card" class="mt-4">
       <el-tab-pane
         v-for="(item, index) in dataList"
         :key="index"

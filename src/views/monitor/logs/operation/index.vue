@@ -5,11 +5,12 @@ import { getPickerShortcuts } from "../../utils";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 
+import View from "@iconify-icons/ep/view";
 import Delete from "@iconify-icons/ep/delete";
 import Refresh from "@iconify-icons/ep/refresh";
 
 defineOptions({
-  name: "OperationLog"
+  name: "SystemLog"
 });
 
 const formRef = ref();
@@ -23,11 +24,13 @@ const {
   pagination,
   selectedNum,
   onSearch,
+  onDetail,
   clearAll,
   resetForm,
   onbatchDel,
   handleSizeChange,
   onSelectionCancel,
+  handleCellDblclick,
   handleCurrentChange,
   handleSelectionChange
 } = useRole(tableRef);
@@ -49,20 +52,9 @@ const {
           class="!w-[170px]"
         />
       </el-form-item>
-      <el-form-item label="操作状态" prop="status">
-        <el-select
-          v-model="form.status"
-          placeholder="请选择"
-          clearable
-          class="!w-[150px]"
-        >
-          <el-option label="成功" value="1" />
-          <el-option label="失败" value="0" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="操作时间" prop="operatingTime">
+      <el-form-item label="请求时间" prop="requestTime">
         <el-date-picker
-          v-model="form.operatingTime"
+          v-model="form.requestTime"
           :shortcuts="getPickerShortcuts()"
           type="datetimerange"
           range-separator="至"
@@ -85,11 +77,7 @@ const {
       </el-form-item>
     </el-form>
 
-    <PureTableBar
-      title="操作日志（仅演示，操作后不生效）"
-      :columns="columns"
-      @refresh="onSearch"
-    >
+    <PureTableBar title="操作日志" :columns="columns" @refresh="onSearch">
       <template #buttons>
         <el-popconfirm title="确定要删除所有日志数据吗？" @confirm="clearAll">
           <template #reference>
@@ -142,7 +130,21 @@ const {
           @selection-change="handleSelectionChange"
           @page-size-change="handleSizeChange"
           @page-current-change="handleCurrentChange"
-        />
+          @cell-dblclick="handleCellDblclick"
+        >
+          <template #operation="{ row }">
+            <el-button
+              class="reset-margin !outline-none"
+              link
+              type="primary"
+              :size="size"
+              :icon="useRenderIcon(View)"
+              @click="onDetail(row)"
+            >
+              详情
+            </el-button>
+          </template>
+        </pure-table>
       </template>
     </PureTableBar>
   </div>

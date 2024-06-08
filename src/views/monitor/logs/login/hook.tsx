@@ -1,35 +1,46 @@
 import dayjs from "dayjs";
-import { message } from "@/utils/message";
-import { getKeyList } from "@pureadmin/utils";
-import { getLoginLogsList } from "@/api/system";
+
 import { usePublicHooks } from "@/views/system/hooks";
 import type { PaginationProps } from "@pureadmin/table";
-import { type Ref, reactive, ref, onMounted, toRaw } from "vue";
+import { reactive, ref, onMounted, watch } from "vue";
+import { getLoginLogList } from "@/api/monitor/loginLog";
+import type { LoginLogQuery } from "@/api/monitor/loginLog/type";
+import { pageConfigDefault } from "@/utils/pageConfigDefault";
 
-export function useRole(tableRef: Ref) {
-  const form = reactive({
-    username: "",
-    status: "",
-    loginTime: ""
+export function useLoginLog() {
+  const form = reactive<LoginLogQuery>({
+    page: 0,
+    pageSize: pageConfigDefault.pageSize,
+    username: undefined,
+    status: undefined,
+    startTime: undefined,
+    endTime: undefined
+  });
+  const dateTimeRange = ref("");
+  watch(dateTimeRange, newVal => {
+    if (newVal) {
+      form.startTime = newVal[0];
+      form.endTime = newVal[1];
+    }
   });
   const dataList = ref([]);
   const loading = ref(true);
-  const selectedNum = ref(0);
   const { tagStyle } = usePublicHooks();
-
   const pagination = reactive<PaginationProps>({
     total: 0,
     pageSize: 10,
     currentPage: 1,
     background: true
   });
+
+  const getActionType = (type, text = false) => {
+    switch (type) {
+      case 1:
+        return text ? "用户名密码" : "primary";
+    }
+  };
+
   const columns: TableColumnList = [
-    {
-      label: "勾选列", // 如果需要表格多选，此处label必须设置
-      type: "selection",
-      fixed: "left",
-      reserveSelection: true // 数据刷新后保留选项
-    },
     {
       label: "序号",
       prop: "id",
@@ -47,7 +58,7 @@ export function useRole(tableRef: Ref) {
     },
     {
       label: "登录地点",
-      prop: "address",
+      prop: "location",
       minWidth: 140
     },
     {
@@ -66,74 +77,50 @@ export function useRole(tableRef: Ref) {
       minWidth: 100,
       cellRenderer: ({ row, props }) => (
         <el-tag size={props.size} style={tagStyle.value(row.status)}>
-          {row.status === 1 ? "成功" : "失败"}
+          {row.status ? "成功" : "失败"}
         </el-tag>
       )
     },
     {
       label: "登录行为",
-      prop: "behavior",
-      minWidth: 100
+      prop: "action",
+      minWidth: 100,
+      cellRenderer: ({ row, props }) => (
+        <el-tag
+          size={props.size}
+          type={getActionType(row.action)}
+          effect="plain"
+        >
+          {getActionType(row.action, true)}
+        </el-tag>
+      )
     },
     {
       label: "登录时间",
       prop: "loginTime",
       minWidth: 180,
       formatter: ({ loginTime }) =>
-        dayjs(loginTime).format("YYYY-MM-DD HH:mm:ss")
+        dayjs.unix(loginTime).format("YYYY-MM-DD HH:mm:ss")
     }
   ];
 
   function handleSizeChange(val: number) {
-    console.log(`${val} items per page`);
+    form.pageSize = val;
+    onSearch();
+    // console.log(`${val} items per page`);
   }
 
   function handleCurrentChange(val: number) {
-    console.log(`current page: ${val}`);
-  }
-
-  /** 当CheckBox选择项发生变化时会触发该事件 */
-  function handleSelectionChange(val) {
-    selectedNum.value = val.length;
-    // 重置表格高度
-    tableRef.value.setAdaptive();
-  }
-
-  /** 取消选择 */
-  function onSelectionCancel() {
-    selectedNum.value = 0;
-    // 用于多选表格，清空用户的选择
-    tableRef.value.getTableRef().clearSelection();
-  }
-
-  /** 批量删除 */
-  function onbatchDel() {
-    // 返回当前选中的行
-    const curSelected = tableRef.value.getTableRef().getSelectionRows();
-    // 接下来根据实际业务，通过选中行的某项数据，比如下面的id，调用接口进行批量删除
-    message(`已删除序号为 ${getKeyList(curSelected, "id")} 的数据`, {
-      type: "success"
-    });
-    tableRef.value.getTableRef().clearSelection();
+    form.page = val;
     onSearch();
-  }
-
-  /** 清空日志 */
-  function clearAll() {
-    // 根据实际业务，调用接口删除所有日志数据
-    message("已删除所有日志数据", {
-      type: "success"
-    });
-    onSearch();
+    // console.log(`current page: ${val}`);
   }
 
   async function onSearch() {
     loading.value = true;
-    const { data } = await getLoginLogsList(toRaw(form));
+    const { data } = await getLoginLogList(form);
     dataList.value = data.list;
     pagination.total = data.total;
-    pagination.pageSize = data.pageSize;
-    pagination.currentPage = data.currentPage;
 
     setTimeout(() => {
       loading.value = false;
@@ -143,6 +130,7 @@ export function useRole(tableRef: Ref) {
   const resetForm = formEl => {
     if (!formEl) return;
     formEl.resetFields();
+    dateTimeRange.value = "";
     onSearch();
   };
 
@@ -152,18 +140,14 @@ export function useRole(tableRef: Ref) {
 
   return {
     form,
+    dateTimeRange,
     loading,
     columns,
     dataList,
     pagination,
-    selectedNum,
     onSearch,
-    clearAll,
     resetForm,
-    onbatchDel,
     handleSizeChange,
-    onSelectionCancel,
-    handleCurrentChange,
-    handleSelectionChange
+    handleCurrentChange
   };
 }
